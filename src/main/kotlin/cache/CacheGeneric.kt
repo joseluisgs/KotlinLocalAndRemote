@@ -31,12 +31,12 @@ open class CacheGeneric<K, T>(
 
 
     override fun put(key: K, value: T) {
-        logger.debug { "Añadiendo el valor de la clave: $key" }
+        logger.debug { "Añadiendo a cache el valor de la clave: $key" }
         cache[key] = value
     }
 
     override fun remove(key: K) {
-        logger.debug { "Eliminando el valor de la clave: $key" }
+        logger.debug { "Eliminando de cache el valor de la clave: $key" }
         cache.remove(key)
     }
 
