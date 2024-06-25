@@ -31,3 +31,5 @@ Para facilitar la serialización y deserialización de los datos, utilizaremos l
 Kotlin `kotlinx.serialization`.
 Además haremos uso de mapeadores para convertir los datos de un formato a otro.
 
+Enlace a los [commit](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/f4cf8d903a9ecb80f36822d870144ea2b8defd57)
+
