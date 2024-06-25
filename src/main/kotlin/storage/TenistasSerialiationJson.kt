@@ -25,14 +25,23 @@ class TenistasSerialiationJson : TenistasSerializationStorage {
 
         if (!file.exists()) {
             emit(Err(TenistaError.StorageError("El fichero no existe ${file.absolutePath}")))
+        } else {
+            emit(readLines(file))
         }
-
-        // Creamos el serializador de JSON
-        val json = Json { ignoreUnknownKeys = true; encodeDefaults = false }
-        // Leemos el fichero y lo convertimos a Tenista
-        val tenistas = json.decodeFromString<List<TenistaDto>>(file.readText()).map { it.toTenista() }
-        emit(Ok(tenistas))
     }.flowOn(Dispatchers.IO) // Cambiamos el contexto de ejecución a IO
+
+    private fun readLines(file: File): Result<List<Tenista>, TenistaError> {
+        return try {
+            // Creamos el serializador de JSON
+            val json = Json { ignoreUnknownKeys = true; encodeDefaults = false }
+            // Leemos el fichero y lo convertimos a Tenista
+            val tenistas = json.decodeFromString<List<TenistaDto>>(file.readText()).map { it.toTenista() }
+            Ok(tenistas)
+        } catch (e: Exception) {
+            logger.error(e) { "Error al leer el fichero: ${file.absolutePath}" }
+            Err(TenistaError.StorageError("Error al leer el fichero ${file.absolutePath}: ${e.message}"))
+        }
+    }
 
     override fun export(file: File, data: List<Tenista>): Flow<Result<Int, TenistaError>> = flow {
         logger.debug { "Exportando Tenistas a JSON asíncrono: $file" }

@@ -26,8 +26,9 @@ class TenistasSerializationCsv : TenistasSerializationStorage {
         // Código de lectura del fichero
         if (!file.exists()) {
             emit(Err(TenistaError.StorageError("El fichero no existe ${file.absolutePath}")))
+        } else {
+            emit(readLines(file))
         }
-        emit(readLines(file))
     }.flowOn(Dispatchers.IO) // Cambiamos el contexto de ejecución
 
 

@@ -24,6 +24,8 @@ dependencies {
 
     // Para test
     testImplementation(kotlin("test"))
+    // Para testear coroutines
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
 }
 
 tasks.test {
