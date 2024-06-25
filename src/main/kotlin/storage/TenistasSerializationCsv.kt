@@ -34,12 +34,16 @@ class TenistasSerializationCsv : TenistasSerializationStorage {
     override fun export(file: File, data: List<Tenista>): Flow<Result<Int, TenistaError>> = flow {
         logger.debug { "Exportando Tenistas a CSV asíncrono: $file" }
 
-        if (file.exists()) {
+        // También podemos usar Files.deleteIfExists(file.toPath()) para borrar el fichero
+        // No es necesario comprobar si existe, ya que si no existe lo crea con el writeText
+        /*if (file.exists()) {
             file.delete() // Borramos el fichero si existe
-        }
+        }*/
         try {
             // Código de escritura del fichero
+            // Escribimos la cabecera
             file.writeText("id,nombre,pais,altura,peso,puntos,mano,fechaNacimiento,createdAt,updatedAt,deletedAt,isDeleted\n")
+            // Escribimos los datos
             data.forEach { tenista ->
                 file.appendText(
                     "${tenista.id},${tenista.nombre},${tenista.pais},${tenista.altura},${tenista.peso},${tenista.puntos},${tenista.mano},${tenista.fechaNacimiento},${tenista.createdAt},${tenista.updatedAt},${tenista.isDeleted}\n"

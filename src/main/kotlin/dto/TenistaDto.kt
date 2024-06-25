@@ -1,9 +1,12 @@
 package dev.joseluisgs.dto
 
+import kotlinx.serialization.Serializable
+
 /**
  * Data Transfer Object para Tenista
  * Usado para la representación de los datos de Tenista
  */
+@Serializable
 data class TenistaDto(
     val id: String,
     val nombre: String,
