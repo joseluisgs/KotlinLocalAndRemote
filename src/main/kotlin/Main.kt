@@ -3,8 +3,8 @@ package dev.joseluisgs
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import dev.joseluisgs.models.Tenista
-import dev.joseluisgs.storage.TenistasSerialiationJson
 import dev.joseluisgs.storage.TenistasSerializationCsv
+import dev.joseluisgs.storage.TenistasSerializationJson
 import kotlinx.coroutines.runBlocking
 import kotlin.io.path.Path
 
@@ -35,7 +35,7 @@ fun main() = runBlocking {
         }
     }
 
-    val tenistasJson = TenistasSerialiationJson()
+    val tenistasJson = TenistasSerializationJson()
     // Prueba de exportación de tenistas a JSON
     tenistasJson.export(Path("data", "tenistas_export.json").toFile(), misTenistas).collect { it ->
         it.onSuccess { size ->

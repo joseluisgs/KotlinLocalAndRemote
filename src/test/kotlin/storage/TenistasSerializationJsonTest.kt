@@ -2,7 +2,7 @@ package storage
 
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.models.Tenista
-import dev.joseluisgs.storage.TenistasSerializationCsv
+import dev.joseluisgs.storage.TenistasSerializationJson
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -15,9 +15,9 @@ import java.time.LocalDate
 import java.util.*
 import kotlin.test.Test
 
-class TenistasSerializationCsvTest {
+class TenistasSerializationJsonTest {
     // importamos la clase a testear
-    private val tenistasSerializationCsv = TenistasSerializationCsv()
+    private val tenistasSerializationJson = TenistasSerializationJson()
 
     @TempDir // Inyectamos un directorio temporal
     lateinit var tempDir: Path
@@ -26,7 +26,7 @@ class TenistasSerializationCsvTest {
     fun `import debe devolver error si el fichero no existe`(): Unit = runTest {
         val nonExistentFile = File(tempDir.toFile(), "fichero_no_existe.csv")
 
-        val result = tenistasSerializationCsv.import(nonExistentFile).firstOrNull()
+        val result = tenistasSerializationJson.import(nonExistentFile).firstOrNull()
         assertAll(
             { assertTrue(result != null) },
             { assertTrue(result!!.isErr) },
@@ -37,17 +37,40 @@ class TenistasSerializationCsvTest {
 
     @Test
     fun `import debe devolver una lista si el fichero existe`() = runTest {
-        val validFile = File(tempDir.toFile(), "tenistas.csv").apply {
+        val validFile = File(tempDir.toFile(), "tenistas.json").apply {
             writeText(
                 """
-                id,nombre,pais,altura,peso,puntos,mano,fecha_nacimiento
-                550e8400-e29b-41d4-a716-446655440000,Novak Djokovic,Serbia,188,77,12030,DIESTRO,1987-05-22
-                550e8400-e29b-41d4-a716-446655440001,Daniil Medvedev,Rusia,198,83,10370,DIESTRO,1996-02-11
-                """.trimIndent()
+                [
+                    {
+                        "id": "550e8400-e29b-41d4-a716-446655440000",
+                        "nombre": "Novak Djokovic",
+                        "pais": "Serbia",
+                        "altura": 188,
+                        "peso": 77,
+                        "puntos": 12030,
+                        "mano": "DIESTRO",
+                        "fechaNacimiento": "1987-05-22",
+                        "createdAt": "2024-06-25T17:49:35.094296800",
+                        "updatedAt": "2024-06-25T17:49:35.094296800"
+                    },
+                    {
+                        "id": "550e8400-e29b-41d4-a716-446655440001",
+                        "nombre": "Daniil Medvedev",
+                        "pais": "Rusia",
+                        "altura": 198,
+                        "peso": 83,
+                        "puntos": 10370,
+                        "mano": "DIESTRO",
+                        "fechaNacimiento": "1996-02-11",
+                        "createdAt": "2024-06-25T17:49:35.094296800",
+                        "updatedAt": "2024-06-25T17:49:35.094296800"
+                    }
+               ]
+               """.trimIndent()
             )
         }
 
-        val result = tenistasSerializationCsv.import(validFile).firstOrNull()
+        val result = tenistasSerializationJson.import(validFile).firstOrNull()
 
         assertAll(
             { assertTrue(result != null) },
@@ -60,7 +83,7 @@ class TenistasSerializationCsvTest {
 
     @Test
     fun `export debe escribir tenistas en un fichero`() = runTest {
-        val file = File(tempDir.toFile(), "tenistas_export.csv")
+        val file = File(tempDir.toFile(), "tenistas_export.json")
         val tenistas = listOf(
             Tenista(
                 id = UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
@@ -84,7 +107,7 @@ class TenistasSerializationCsvTest {
             )
         )
 
-        val result = tenistasSerializationCsv.export(file, tenistas).firstOrNull()
+        val result = tenistasSerializationJson.export(file, tenistas).firstOrNull()
 
         assertAll(
             { assertTrue(result != null) },
@@ -102,7 +125,7 @@ class TenistasSerializationCsvTest {
 
     @Test
     fun `export debe devolver error si no existe fichero`() = runTest {
-        val invalidFile = File("/invalid/path/tenistas_export.csv")
+        val invalidFile = File("/invalid/path/tenistas_export.json")
         val tenistas = listOf(
             Tenista(
                 id = UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
@@ -116,7 +139,7 @@ class TenistasSerializationCsvTest {
             )
         )
 
-        val result = tenistasSerializationCsv.export(invalidFile, tenistas).firstOrNull()
+        val result = tenistasSerializationJson.export(invalidFile, tenistas).firstOrNull()
 
         assertAll(
             { assertTrue(result != null) },

@@ -1,8 +1,6 @@
 package dev.joseluisgs.storage
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.*
 import dev.joseluisgs.dto.TenistaDto
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.mapper.toTenista
@@ -35,26 +33,22 @@ class TenistasSerializationCsv : TenistasSerializationStorage {
     override fun export(file: File, data: List<Tenista>): Flow<Result<Int, TenistaError>> = flow {
         logger.debug { "Exportando Tenistas a CSV asíncrono: $file" }
 
-        // También podemos usar Files.deleteIfExists(file.toPath()) para borrar el fichero
-        // No es necesario comprobar si existe, ya que si no existe lo crea con el writeText
-        /*if (file.exists()) {
-            file.delete() // Borramos el fichero si existe
-        }*/
-        try {
-            // Código de escritura del fichero
-            // Escribimos la cabecera
-            file.writeText("id,nombre,pais,altura,peso,puntos,mano,fechaNacimiento,createdAt,updatedAt,deletedAt,isDeleted\n")
-            // Escribimos los datos
-            data.forEach { tenista ->
-                file.appendText(
-                    "${tenista.id},${tenista.nombre},${tenista.pais},${tenista.altura},${tenista.peso},${tenista.puntos},${tenista.mano},${tenista.fechaNacimiento},${tenista.createdAt},${tenista.updatedAt},${tenista.isDeleted}\n"
-                )
+        ensureFileCanExists(file)
+            .onFailure { error ->
+                emit(Err(error))
             }
-            emit(Ok(data.size))
-        } catch (e: Exception) {
-            logger.error(e) { "Error al escribir el fichero: ${file.absolutePath}" }
-            emit(Err(TenistaError.StorageError("Error al escribir el fichero ${file.absolutePath}: ${e.message}")))
-        }
+            .onSuccess { file ->
+                // Código de escritura del fichero
+                // Escribimos la cabecera
+                file.writeText("id,nombre,pais,altura,peso,puntos,mano,fechaNacimiento,createdAt,updatedAt,deletedAt,isDeleted\n")
+                // Escribimos los datos
+                data.forEach { tenista ->
+                    file.appendText(
+                        "${tenista.id},${tenista.nombre},${tenista.pais},${tenista.altura},${tenista.peso},${tenista.puntos},${tenista.mano},${tenista.fechaNacimiento},${tenista.createdAt},${tenista.updatedAt},${tenista.isDeleted}\n"
+                    )
+                }
+                emit(Ok(data.size))
+            }
     }.flowOn(Dispatchers.IO) // Cambiamos el contexto de ejecución a IO
 
 
@@ -72,22 +66,26 @@ class TenistasSerializationCsv : TenistasSerializationStorage {
             Err(TenistaError.StorageError("Error al leer el fichero ${file.absolutePath}: ${e.message}"))
         }
     }
+
+    private fun parseLine(parts: List<String>): Tenista {
+        logger.debug { "Parseando línea: $parts" }
+        return TenistaDto(
+            id = parts[0],
+            nombre = parts[1],
+            pais = parts[2],
+            altura = parts[3].toInt(),
+            peso = parts[4].toInt(),
+            puntos = parts[5].toInt(),
+            mano = parts[6],
+            fechaNacimiento = parts[7],
+            // Estos campos son opcionales y pueden ser nulos o no estar en el CSV
+            createdAt = parts.getOrNull(8),
+            updatedAt = parts.getOrNull(9),
+            isDeleted = parts.getOrNull(10)?.toBoolean() ?: false
+        ).toTenista()
+    }
+
+
 }
 
-private fun parseLine(parts: List<String>): Tenista {
-    logger.debug { "Parseando línea: $parts" }
-    return TenistaDto(
-        id = parts[0],
-        nombre = parts[1],
-        pais = parts[2],
-        altura = parts[3].toInt(),
-        peso = parts[4].toInt(),
-        puntos = parts[5].toInt(),
-        mano = parts[6],
-        fechaNacimiento = parts[7],
-        // Estos campos son opcionales y pueden ser nulos o no estar en el CSV
-        createdAt = parts.getOrNull(8),
-        updatedAt = parts.getOrNull(9),
-        isDeleted = parts.getOrNull(10)?.toBoolean() ?: false
-    ).toTenista()
-}
+
