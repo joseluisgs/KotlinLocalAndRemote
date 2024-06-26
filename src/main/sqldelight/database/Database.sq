@@ -1,0 +1,52 @@
+-- Database: Tablas y Operaciones CRUD
+
+-- Tabla de productos
+CREATE TABLE IF NOT EXISTS TenistaEntity (
+    id TEXT PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    pais TEXT NOT NULL,
+    altura INTEGER NOT NULL,
+    peso INTEGER NOT NULL,
+    puntos INTEGER NOT NULL,
+    mano TEXT NOT NULL,
+    fechaNacimiento TEXT NOT NULL,
+    createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    isDeleted INTEGER NOT NULL DEFAULT 0
+);
+
+-- Operaciones
+removeAll:
+DELETE FROM TenistaEntity;
+
+selectAll:
+SELECT * FROM TenistaEntity;
+
+seletctAllbyIsDeleted:
+SELECT * FROM TenistaEntity WHERE isDeleted = ?;
+
+selectAllOrderByPuntosDesc:
+SELECT * FROM TenistaEntity ORDER BY puntos DESC;
+
+selectById:
+SELECT * FROM TenistaEntity WHERE id = ?;
+
+selectLastInserted:
+SELECT * FROM TenistaEntity WHERE id = last_insert_rowid();
+
+insert:
+INSERT INTO TenistaEntity (id, nombre, pais, altura, peso, puntos, mano, fechaNacimiento) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+insertTenista:
+INSERT INTO TenistaEntity (id, nombre, pais, altura, peso, puntos, mano, fechaNacimiento) VALUES ?;
+
+update:
+UPDATE TenistaEntity SET nombre = ?, pais = ?, altura = ?, peso = ?, puntos = ?, mano = ?, fechaNacimiento = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?;
+
+delete:
+DELETE FROM TenistaEntity WHERE id = ?;
+
+deleteLogic:
+UPDATE TenistaEntity SET isDeleted = 1, updatedAt = CURRENT_TIMESTAMP WHERE id = ?;
+
+

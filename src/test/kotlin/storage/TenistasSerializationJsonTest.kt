@@ -3,7 +3,7 @@ package storage
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.storage.TenistasSerializationJson
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -26,12 +26,11 @@ class TenistasSerializationJsonTest {
     fun `import debe devolver error si el fichero no existe`(): Unit = runTest {
         val nonExistentFile = File(tempDir.toFile(), "fichero_no_existe.csv")
 
-        val result = tenistasSerializationJson.import(nonExistentFile).firstOrNull()
+        val result = tenistasSerializationJson.import(nonExistentFile).first()
         assertAll(
-            { assertTrue(result != null) },
-            { assertTrue(result!!.isErr) },
-            { assertTrue(result!!.error is TenistaError.StorageError) },
-            { assertTrue(result!!.error.message.contains("El fichero no existe")) }
+            { assertTrue(result.isErr) },
+            { assertTrue(result.error is TenistaError.StorageError) },
+            { assertTrue(result.error.message.contains("El fichero no existe")) }
         )
     }
 
@@ -70,14 +69,13 @@ class TenistasSerializationJsonTest {
             )
         }
 
-        val result = tenistasSerializationJson.import(validFile).firstOrNull()
+        val result = tenistasSerializationJson.import(validFile).first()
 
         assertAll(
-            { assertTrue(result != null) },
-            { assertTrue(result!!.isOk) },
-            { assertEquals(2, result!!.value.size) },
-            { assertEquals("Novak Djokovic", result!!.value[0].nombre) },
-            { assertEquals("Daniil Medvedev", result!!.value[1].nombre) }
+            { assertTrue(result.isOk) },
+            { assertEquals(2, result.value.size) },
+            { assertEquals("Novak Djokovic", result.value[0].nombre) },
+            { assertEquals("Daniil Medvedev", result.value[1].nombre) }
         )
     }
 
@@ -107,12 +105,11 @@ class TenistasSerializationJsonTest {
             )
         )
 
-        val result = tenistasSerializationJson.export(file, tenistas).firstOrNull()
+        val result = tenistasSerializationJson.export(file, tenistas).first()
 
         assertAll(
-            { assertTrue(result != null) },
-            { assertTrue(result!!.isOk) },
-            { assertEquals(2, result!!.value) },
+            { assertTrue(result.isOk) },
+            { assertEquals(2, result.value) },
             { assertTrue(file.exists()) },
         )
 
@@ -139,13 +136,12 @@ class TenistasSerializationJsonTest {
             )
         )
 
-        val result = tenistasSerializationJson.export(invalidFile, tenistas).firstOrNull()
+        val result = tenistasSerializationJson.export(invalidFile, tenistas).first()
 
         assertAll(
-            { assertTrue(result != null) },
-            { assertTrue(result!!.isErr) },
-            { assertTrue(result!!.error is TenistaError.StorageError) },
-            { assertTrue(result!!.error.message.contains("Error al acceder al fichero")) }
+            { assertTrue(result.isErr) },
+            { assertTrue(result.error is TenistaError.StorageError) },
+            { assertTrue(result.error.message.contains("Error al acceder al fichero")) }
         )
     }
 
