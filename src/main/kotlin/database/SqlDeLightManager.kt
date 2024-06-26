@@ -15,3 +15,10 @@ fun createInMemoryDatabase(): DatabaseQueries {
     }.databaseQueries
 }
 
+fun createDatabase(path: String = "database.db"): DatabaseQueries {
+    return JdbcSqliteDriver("jdbc:sqlite:$path").let { driver ->
+        AppDatabase.Schema.create(driver)
+        AppDatabase(driver)
+    }.databaseQueries
+}
+

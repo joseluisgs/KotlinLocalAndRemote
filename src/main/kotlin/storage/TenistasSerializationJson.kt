@@ -51,8 +51,8 @@ class TenistasSerializationJson : TenistasSerializationStorage {
             }
             // En caso de éxito, escribimos el fichero
             .onSuccess { file ->
-                // Creamos el serializador de JSON
-                val json = Json { ignoreUnknownKeys = true; encodeDefaults = false }
+                // Creamos el serializador de JSON con prettyPrint
+                val json = Json { ignoreUnknownKeys = true; encodeDefaults = false; prettyPrint = true }
                 // Convertimos los Tenistas a DTO y los serializamos
                 val tenistasDto = data.map { it.toTenistaDto() }
                 // Escribimos el fichero

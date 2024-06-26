@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
@@ -22,6 +24,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TenistasRepositoryLocalTest {
 
     @MockK
@@ -32,6 +35,12 @@ class TenistasRepositoryLocalTest {
 
     // Al ser una propiedad lazy, se inicializa cuando se llama, por lo que ya estran listos los mocks
     private val repository: TenistasRepositoryLocal by lazy { TenistasRepositoryLocal(sqlClient) }
+
+    @BeforeAll
+    fun setUpAll() {
+        // Es qe hay un init que se hace nada mas crear el objeto
+        coEvery { databaseQueries.removeAll() } returns Unit
+    }
 
 
     private val testTenista = Tenista(

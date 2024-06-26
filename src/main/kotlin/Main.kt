@@ -3,7 +3,7 @@ package dev.joseluisgs
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import database.SqlDeLightManager
-import database.createInMemoryDatabase
+import database.createDatabase
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.repository.TenistasRepositoryLocal
 import dev.joseluisgs.storage.TenistasSerializationCsv
@@ -56,8 +56,9 @@ fun main(): Unit = runBlocking {
             println(error.message)
         }
 
-    // jugando con repositorio local
-    val tenistasRepositoryLocal = TenistasRepositoryLocal(SqlDeLightManager(createInMemoryDatabase()))
+    // jugando con repositorio local memoria
+    // val tenistasRepositoryLocal = TenistasRepositoryLocal(SqlDeLightManager(createInMemoryDatabase()))
+    val tenistasRepositoryLocal = TenistasRepositoryLocal(SqlDeLightManager(createDatabase("tenistas.db")))
 
     // Insertamos un tenista
     tenistasRepositoryLocal.save(misTenistas.first()).first()

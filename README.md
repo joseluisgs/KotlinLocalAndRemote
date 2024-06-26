@@ -1,5 +1,7 @@
 # Kotlin Local and Remote
 
+![Kotlin](./images/kotlin.webp)
+
 ## Acerca de
 
 Este proyecto es un ejemplo de como crear un servicio para el almacenamiento de datos Kotlin.
@@ -38,6 +40,43 @@ La idea subyacente es el famoso patrón de diseño Repository usado en Android, 
 
 ![Repository Pattern](./images/pattern.webp)
 
+## Programación asíncrona y reactiva
+
+La
+programación [asíncrona](https://sunscrapers.com/blog/programming-async-vs-sync-best-approach/)
+es un modelo de programación que permite realizar tareas en segundo plano sin bloquear el hilo
+principal de
+la aplicación.
+La [reactividad](https://www.baeldung.com/cs/reactive-programming#:~:text=Reactive%20programming%20is%20a%20declarative,or%20reactive%20systems%20in%20general.)
+es un modelo de programación que permite reaccionar a eventos de forma rápida y eficiente.
+La programación reactiva es un paradigma de programación declarativa que se basa en la idea del procesamiento asíncrono
+de eventos y flujos de datos.
+
+En Kotlin, la programación asíncrona y reactiva se puede realizar
+con [Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
+y [Flows](https://kotlinlang.org/docs/flow.html). Las Coroutines son tareas que
+se pueden suspender y
+reanudar. De esta manera, se pueden realizar tareas en segundo plano
+y nos permiten realizar operaciones asíncronas de forma sencilla y eficiente. Los Flows son secuencias de valores que se
+pueden emitir de forma asíncrona. De esta manera, se pueden
+realizar operaciones reactivas de forma sencilla y eficiente.
+
+## Railway Oriented Programming
+
+El [Railway Oriented Programming](https://fsharpforfunandprofit.com/rop/) (ROP) es un estilo de programación que se basa
+en el uso de funciones que devuelven un
+resultado. De esta manera, se pueden encadenar operaciones de forma sencilla y eficiente. En Kotlin, el ROP se puede
+realizar con la clase Result. La clase Result es una clase que representa un resultado exitoso o un resultado fallido.
+De
+esta manera, se pueden realizar operaciones de forma sencilla y eficiente.
+
+Para ello debemos entender que es el Happy Path y el Error Path. El Happy Path es el camino feliz, es decir, el camino
+que se espera que se siga. El Error Path es el camino de error, es decir, el camino que se sigue cuando se produce un
+error.
+
+De esta manera podemos encadenar operaciones de forma sencilla y eficiente. Si una operación falla, se sigue el Error
+Path. Si una operación tiene éxito, se sigue el Happy Path.
+
 ## Almacenamiento y Serialización
 
 El primer paso es crear un servicio de almacenamiento y serialización de datos para realizar las operaciones de lectura
@@ -46,12 +85,16 @@ escritura.
 
 Luego, crearemos una implementación de esta interfaz para almacenar los datos en formatos CSV y JSON.
 Para facilitar la serialización y deserialización de los datos, utilizaremos la librería de
-Kotlin `kotlinx.serialization`.
+Kotlin [`kotlinx.serialization`](https://kotlinlang.org/docs/serialization.html).
 
-Haremos uso de mapeadores para convertir los datos de un formato a otro. Para ello haremos uso de las funciones de
-extensión de Kotlin. Estas funciones nos permiten añadir nuevas funcionalidades a las clases sin modificarlas. En este
+Haremos uso de mapeadores para convertir los datos de un formato a otro. Para ello haremos uso de las [funciones de
+extensión de Kotlin](https://kotlinlang.org/docs/extensions.html). Estas funciones nos permiten añadir nuevas
+funcionalidades a las clases sin modificarlas. En este
 caso añadiremos
 funciones de extensión para convertir los datos de un formato a otro.
+
+En todo momento trabajaremos la asincronía con [Flows](https://kotlinlang.org/docs/flow.html) y trabajaremos ROP con
+[Result](https://github.com/michaelbull/kotlin-result).
 
 Enlace a
 los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/f4cf8d903a9ecb80f36822d870144ea2b8defd57)
@@ -82,3 +125,20 @@ recientemente usado.
 
 Enlace a
 los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/7003a44892d4c540530e78b31e6123d4c8e882a5)
+
+## Repositorio Local
+
+Para la realización del repositorio local, hemos usado SQLite [SQLDelight](https://cashapp.github.io/sqldelight/2.0.2/),
+una librería que nos permite definir las
+tablas y las consultas en un archivo `.sq` y generar el código necesario para interactuar con la base de datos.
+
+Para ello, hemos creado un archivo `.sq` con la definición de la tabla y las consultas necesarias. Luego, hemos
+configurado el plugin de SQLDelight en el `build.gradle` para que genere el código necesario.
+
+Para la implementación del repositorio local, hemos creado una interfaz `Repository` que define las operaciones de
+lectura y escritura de datos. Seguimos usando asincronía con Flows y trabajando ROP con Result.
+
+De esta manera hemos podido separar la lógica de la base de datos de la lógica de la aplicación.
+
+Enlace a
+los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/47eda1a0454724f49fcb384de63256664f597da6)

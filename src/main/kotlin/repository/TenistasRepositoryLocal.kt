@@ -25,6 +25,11 @@ class TenistasRepositoryLocal(
     private val sqlClient: SqlDeLightManager,
 ) : TenistasRepository {
 
+    init {
+        logger.debug { "Inicializando el repositorio local" }
+        sqlClient.queries.removeAll()
+    }
+
     override fun getAll(): Flow<Result<List<Tenista>, TenistaError>> = flow {
         logger.debug { "Obteniendo todos los tenistas ordenados por puntos" }
         emit(Ok(sqlClient.queries.selectAllOrderByPuntosDesc().executeAsList().map { it.toTenista() }))
