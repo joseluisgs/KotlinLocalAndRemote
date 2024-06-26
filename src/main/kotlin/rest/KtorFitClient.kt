@@ -14,8 +14,8 @@ import org.lighthousegames.logging.logging
 private val logger = logging()
 
 class KtorFitClient {
-    // url de la api https://retool.com/utilities/generate-api-from-csv carga un CSV alli y la pegas
-    private val API_URL = "https://retoolapi.dev/kj0Sr9/"
+    // https://my-json-server.typicode.com/joseluisgs/KotlinLocalAndRemote
+    private val API_URL = "https://my-json-server.typicode.com/joseluisgs/KotlinLocalAndRemote/"
     val rest = Ktorfit.Builder()
         .httpClient {
             install(ContentNegotiation) {

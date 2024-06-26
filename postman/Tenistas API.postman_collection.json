@@ -12,16 +12,23 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://api-generator.retool.com/kj0Sr9/tenistas",
+					"raw": "https://my-json-server.typicode.com/joseluisgs/KotlinLocalAndRemote/tenistas?_sort=id",
 					"protocol": "https",
 					"host": [
-						"api-generator",
-						"retool",
+						"my-json-server",
+						"typicode",
 						"com"
 					],
 					"path": [
-						"kj0Sr9",
+						"joseluisgs",
+						"KotlinLocalAndRemote",
 						"tenistas"
+					],
+					"query": [
+						{
+							"key": "_sort",
+							"value": "id"
+						}
 					]
 				}
 			},
@@ -33,15 +40,16 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://api-generator.retool.com/kj0Sr9/tenistas/1",
+					"raw": "https://my-json-server.typicode.com/joseluisgs/KotlinLocalAndRemote/tenistas/1",
 					"protocol": "https",
 					"host": [
-						"api-generator",
-						"retool",
+						"my-json-server",
+						"typicode",
 						"com"
 					],
 					"path": [
-						"kj0Sr9",
+						"joseluisgs",
+						"KotlinLocalAndRemote",
 						"tenistas",
 						"1"
 					]
@@ -64,15 +72,16 @@
 					}
 				},
 				"url": {
-					"raw": "https://api-generator.retool.com/kj0Sr9/tenistas",
+					"raw": "https://my-json-server.typicode.com/joseluisgs/KotlinLocalAndRemote/tenistas",
 					"protocol": "https",
 					"host": [
-						"api-generator",
-						"retool",
+						"my-json-server",
+						"typicode",
 						"com"
 					],
 					"path": [
-						"kj0Sr9",
+						"joseluisgs",
+						"KotlinLocalAndRemote",
 						"tenistas"
 					]
 				}
@@ -94,15 +103,17 @@
 					}
 				},
 				"url": {
-					"raw": "https://api-generator.retool.com/kj0Sr9/tenistas/1",
+					"raw": "https://my-json-server.typicode.com/joseluisgs/KotlinLocalAndRemote//tenistas/1",
 					"protocol": "https",
 					"host": [
-						"api-generator",
-						"retool",
+						"my-json-server",
+						"typicode",
 						"com"
 					],
 					"path": [
-						"kj0Sr9",
+						"joseluisgs",
+						"KotlinLocalAndRemote",
+						"",
 						"tenistas",
 						"1"
 					]
@@ -116,17 +127,18 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "https://api-generator.retool.com/kj0Sr9/tenistas/27",
+					"raw": "https://my-json-server.typicode.com/joseluisgs/KotlinLocalAndRemote/tenistas/1",
 					"protocol": "https",
 					"host": [
-						"api-generator",
-						"retool",
+						"my-json-server",
+						"typicode",
 						"com"
 					],
 					"path": [
-						"kj0Sr9",
+						"joseluisgs",
+						"KotlinLocalAndRemote",
 						"tenistas",
-						"27"
+						"1"
 					]
 				}
 			},

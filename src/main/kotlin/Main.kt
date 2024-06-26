@@ -185,7 +185,7 @@ fun main(): Unit = runBlocking {
         }
 
     // Actualizamos un tenista
-    tenistasRepositoryRemote.update(27, tenistaForUpdate.copy(id = 27)).first()
+    tenistasRepositoryRemote.update(misTenistas.first().id, tenistaForUpdate).first()
         .onSuccess { tenista ->
             println("Tenista actualizado: $tenista")
         }.onFailure { error ->
@@ -201,9 +201,9 @@ fun main(): Unit = runBlocking {
         }
 
     // Borramos un tenista
-    tenistasRepositoryRemote.delete(27).first()
+    tenistasRepositoryRemote.delete((misTenistas.first().id)).first()
         .onSuccess { tenista ->
-            println("Tenista borrado con id 27")
+            println("Tenista borrado con id ${misTenistas.first().id}")
         }.onFailure { error ->
             println(error.message)
         }
