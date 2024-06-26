@@ -8,6 +8,7 @@ import dev.joseluisgs.mapper.toTenistaEntity
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.repository.TenistasRepositoryLocal
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -69,6 +70,8 @@ class TenistasRepositoryLocalTest {
             { assertTrue(result.isOk) },
             { assertEquals(listOf(testTenista), result.value) }
         )
+
+        coVerify(atLeast = 1) { databaseQueries.selectAllOrderByPuntosDesc() }
     }
 
     @Test
@@ -83,6 +86,8 @@ class TenistasRepositoryLocalTest {
             { assertTrue(result.isOk) },
             { assertEquals(testTenista, result.value) }
         )
+
+        coVerify(atLeast = 1) { databaseQueries.selectById(id) }
     }
 
     @Test
@@ -97,6 +102,8 @@ class TenistasRepositoryLocalTest {
             { assertTrue(result.isErr) },
             { assertEquals(TenistaError.NotFound(id).message, result.error.message) }
         )
+
+        coVerify(atLeast = 1) { databaseQueries.selectById(id) }
     }
 
     @Test
@@ -131,6 +138,15 @@ class TenistasRepositoryLocalTest {
                 )
             }
         )
+
+        coVerify(atLeast = 1) {
+            databaseQueries.transaction(
+                noEnclosing = false,
+                any<TransactionWithoutReturn.() -> Unit>()
+            )
+        }
+
+        coVerify(atLeast = 1) { databaseQueries.selectLastInserted() }
 
     }
 
@@ -167,6 +183,9 @@ class TenistasRepositoryLocalTest {
                 )
             }
         )
+
+        coVerify(atLeast = 1) { databaseQueries.selectById(id) }
+        coVerify(atLeast = 1) { databaseQueries.update(any(), any(), any(), any(), any(), any(), any(), any(), any()) }
     }
 
     @Test
@@ -183,6 +202,9 @@ class TenistasRepositoryLocalTest {
             { assertTrue(result.isErr) },
             { assertEquals(TenistaError.NotFound(id).message, result.error.message) }
         )
+
+        coVerify(atLeast = 1) { databaseQueries.selectById(id) }
+        coVerify(atLeast = 0) { databaseQueries.update(any(), any(), any(), any(), any(), any(), any(), any(), any()) }
     }
 
     @Test
@@ -202,6 +224,9 @@ class TenistasRepositoryLocalTest {
             { assertTrue(result.isOk) },
             { assertEquals(testTenista.copy(updatedAt = result.value.updatedAt, isDeleted = true), result.value) }
         )
+
+        coVerify(atLeast = 1) { databaseQueries.selectById(id) }
+        coVerify(atLeast = 1) { databaseQueries.delete(id) }
     }
 
     @Test
@@ -217,6 +242,9 @@ class TenistasRepositoryLocalTest {
             { assertTrue(result.isErr) },
             { assertEquals(TenistaError.NotFound(id).message, result.error.message) }
         )
+
+        coVerify(atLeast = 1) { databaseQueries.selectById(id) }
+        coVerify(atLeast = 0) { databaseQueries.delete(id) }
     }
 
 }
