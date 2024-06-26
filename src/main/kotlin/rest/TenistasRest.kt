@@ -16,7 +16,7 @@ interface TenistasRest {
     @POST("/tenistas")
     suspend fun save(@Body tenista: TenistaDto): Response<TenistaDto>
 
-    @POST("/tenistas/{id}")
+    @PUT("/tenistas/{id}")
     suspend fun update(@Path("id") id: Long, @Body tenista: TenistaDto): Response<TenistaDto>
 
     @DELETE("/tenistas/{id}")

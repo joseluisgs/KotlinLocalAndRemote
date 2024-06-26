@@ -6,6 +6,7 @@ import database.SqlDeLightManager
 import database.createDatabase
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.repository.TenistasRepositoryLocal
+import dev.joseluisgs.repository.TenistasRepositoryRemote
 import dev.joseluisgs.rest.KtorFitClient
 import dev.joseluisgs.storage.TenistasSerializationCsv
 import dev.joseluisgs.storage.TenistasSerializationJson
@@ -16,16 +17,7 @@ import kotlin.io.path.Path
 fun main(): Unit = runBlocking {
     println("Hola Tenistas!")
 
-    val restClient = KtorFitClient()
-    val tenistas = restClient.client.getAll()
-    if (tenistas.isSuccessful) {
-        println("Tenistas obtenidos: ${tenistas.body()}")
-    } else {
-        println("Error obteniendo tenistas: ${tenistas.errorBody()}")
-    }
-
     val tenistasCsv = TenistasSerializationCsv()
-
     // Prueba de importación de tenistas desde CSV
     var misTenistas = listOf<Tenista>()
     tenistasCsv.import(Path("data", "tenistas.csv").toFile()).first()
@@ -129,7 +121,15 @@ fun main(): Unit = runBlocking {
     // Borramos un tenista
     tenistasRepositoryLocal.delete(misTenistas.first().id).first()
         .onSuccess { tenista ->
-            println("Tenista borrado: $tenista")
+            println("Tenista borrado con id ${misTenistas.first().id}")
+        }.onFailure { error ->
+            println(error.message)
+        }
+
+    // Borramos un tenista que no existe
+    tenistasRepositoryLocal.delete(-1).first()
+        .onSuccess { tenista ->
+            println("Tenista borrado")
         }.onFailure { error ->
             println(error.message)
         }
@@ -150,4 +150,78 @@ fun main(): Unit = runBlocking {
             println(error.message)
         }
 
+    val tenistasRepositoryRemote = TenistasRepositoryRemote(KtorFitClient())
+
+    // Obtenemos todos los tenistas
+    tenistasRepositoryRemote.getAll().first()
+        .onSuccess { tenistas ->
+            println("Tenistas obtenidos: $tenistas")
+        }.onFailure { error ->
+            println(error.message)
+        }
+
+    // Seleccionamos un tenista 1
+    tenistasRepositoryRemote.getById(1).first()
+        .onSuccess { tenista ->
+            println("Tenista seleccionado: $tenista")
+        }.onFailure { error ->
+            println(error.message)
+        }
+
+    // Seleccionamos un tenista que no existe
+    tenistasRepositoryRemote.getById(-1).first()
+        .onSuccess { tenista ->
+            println("Tenista seleccionado: $tenista")
+        }.onFailure { error ->
+            println(error.message)
+        }
+
+    // Insertamos un tenista
+    tenistasRepositoryRemote.save(misTenistas.first().copy(id = Tenista.NEW_ID)).first()
+        .onSuccess { tenista ->
+            println("Tenista insertado: $tenista")
+        }.onFailure { error ->
+            println(error.message)
+        }
+
+    // Actualizamos un tenista
+    tenistasRepositoryRemote.update(27, tenistaForUpdate.copy(id = 27)).first()
+        .onSuccess { tenista ->
+            println("Tenista actualizado: $tenista")
+        }.onFailure { error ->
+            println(error.message)
+        }
+
+    // Actualizamos un tenista que no existe
+    tenistasRepositoryRemote.update(-1, tenistaForUpdate).first()
+        .onSuccess { tenista ->
+            println("Tenista actualizado: $tenista")
+        }.onFailure { error ->
+            println(error.message)
+        }
+
+    // Borramos un tenista
+    tenistasRepositoryRemote.delete(27).first()
+        .onSuccess { tenista ->
+            println("Tenista borrado con id 27")
+        }.onFailure { error ->
+            println(error.message)
+        }
+
+    // Borramos un tenista que no existe
+    tenistasRepositoryRemote.delete(-1).first()
+        .onSuccess { tenista ->
+            println("Tenista borrado con id -1")
+        }.onFailure { error ->
+            println(error.message)
+        }
+
+    // Obtenemos todos los tenistas
+    tenistasRepositoryRemote.getAll().first()
+        .onSuccess { tenistas ->
+            println("Tenistas obtenidos: $tenistas")
+        }.onFailure { error ->
+            println(error.message)
+        }
+    println("Adios Tenistas!")
 }

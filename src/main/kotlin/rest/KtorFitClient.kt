@@ -16,7 +16,7 @@ private val logger = logging()
 class KtorFitClient {
     // url de la api https://retool.com/utilities/generate-api-from-csv carga un CSV alli y la pegas
     private val API_URL = "https://retoolapi.dev/kj0Sr9/"
-    val client = Ktorfit.Builder()
+    val rest = Ktorfit.Builder()
         .httpClient {
             install(ContentNegotiation) {
                 json(Json { isLenient = true; ignoreUnknownKeys = true; encodeDefaults = false })

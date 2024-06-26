@@ -222,7 +222,6 @@ class TenistasRepositoryLocalTest {
         val result = repository.delete(id).first()
         assertAll(
             { assertTrue(result.isOk) },
-            { assertEquals(testTenista.copy(updatedAt = result.value.updatedAt, isDeleted = true), result.value) }
         )
 
         coVerify(atLeast = 1) { databaseQueries.selectById(id) }
