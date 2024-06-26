@@ -7,7 +7,8 @@ import database.createDatabase
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.repository.TenistasRepositoryLocal
 import dev.joseluisgs.repository.TenistasRepositoryRemote
-import dev.joseluisgs.rest.KtorFitClient
+import dev.joseluisgs.rest.API_TENISTAS_URL
+import dev.joseluisgs.rest.getKtorFitClient
 import dev.joseluisgs.storage.TenistasSerializationCsv
 import dev.joseluisgs.storage.TenistasSerializationJson
 import kotlinx.coroutines.flow.first
@@ -150,7 +151,8 @@ fun main(): Unit = runBlocking {
             println(error.message)
         }
 
-    val tenistasRepositoryRemote = TenistasRepositoryRemote(KtorFitClient())
+    val tenistasRepositoryRemote =
+        TenistasRepositoryRemote(getKtorFitClient(API_TENISTAS_URL).create())
 
     // Obtenemos todos los tenistas
     tenistasRepositoryRemote.getAll().first()
@@ -224,4 +226,5 @@ fun main(): Unit = runBlocking {
             println(error.message)
         }
     println("Adios Tenistas!")
+
 }

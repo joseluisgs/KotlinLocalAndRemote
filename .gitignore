@@ -41,7 +41,7 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-##
+
 /data/tenistas_export.csv
 /data/tenistas_export.json
 tenistas.db
