@@ -141,4 +141,4 @@ lectura y escritura de datos. Seguimos usando asincronía con Flows y trabajando
 De esta manera hemos podido separar la lógica de la base de datos de la lógica de la aplicación.
 
 Enlace a
-los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/47eda1a0454724f49fcb384de63256664f597da6)
+los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/39d0e8c0a2e0fb2c5b6d80fe10b9c50ce1019385)
