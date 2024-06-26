@@ -25,16 +25,14 @@ class TenistasRepositoryLocal(
     private val sqlClient: SqlDeLightManager,
 ) : TenistasRepository {
 
-    private val db = sqlClient.databaseQueries // Acceso a la base de datos
-
     override fun getAll(): Flow<Result<List<Tenista>, TenistaError>> = flow {
         logger.debug { "Obteniendo todos los tenistas ordenados por puntos" }
-        emit(Ok(db.selectAllOrderByPuntosDesc().executeAsList().map { it.toTenista() }))
+        emit(Ok(sqlClient.queries.selectAllOrderByPuntosDesc().executeAsList().map { it.toTenista() }))
     }.flowOn(Dispatchers.IO)
 
     override fun getById(id: UUID): Flow<Result<Tenista, TenistaError>> = flow {
         logger.debug { "Obteniendo tenista por id: $id" }
-        db.selectById(id.toString()).executeAsOneOrNull()?.let {
+        sqlClient.queries.selectById(id.toString()).executeAsOneOrNull()?.let {
             emit(Ok(it.toTenista()))
         } ?: emit(Err(TenistaError.NotFound(id.toString())))
     }.flowOn(Dispatchers.IO)
@@ -42,7 +40,7 @@ class TenistasRepositoryLocal(
     override fun save(t: Tenista): Flow<Result<Tenista, TenistaError>> = flow<Result<Tenista, TenistaError>> {
         logger.debug { "Guardando tenista: $t" }
         val timeSpam = LocalDateTime.now()
-        db.insert(t.toTenistaEntity())
+        sqlClient.queries.insert(t.toTenistaEntity())
         emit(
             Ok(t.copy(createdAt = timeSpam, updatedAt = timeSpam))
         )
@@ -53,7 +51,7 @@ class TenistasRepositoryLocal(
         val timestamp = LocalDateTime.now()
         emit(getById(id).first().mapBoth(
             success = { tenista ->
-                db.update(
+                sqlClient.queries.update(
                     id = id.toString(),
                     nombre = t.nombre,
                     pais = t.pais,
@@ -75,7 +73,7 @@ class TenistasRepositoryLocal(
         logger.debug { "Borrando lógico tenista por id: $id" }
         emit(getById(id).first().mapBoth(
             success = { tenista ->
-                db.delete(id.toString())
+                sqlClient.queries.delete(id.toString())
                 Ok(tenista.copy(updatedAt = LocalDateTime.now(), isDeleted = true))
             },
             failure = { error -> Err(error) }

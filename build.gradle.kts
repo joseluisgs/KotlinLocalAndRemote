@@ -26,7 +26,7 @@ dependencies {
     // SqlDelight Database
     implementation("app.cash.sqldelight:sqlite-driver:2.0.2")
     // SqlDelight Coroutines Extensions
-    implementation("app.cash.sqldelight:coroutines-extensions:2.0.2")
+    // implementation("app.cash.sqldelight:coroutines-extensions:2.0.2")
 
     // Para test
     testImplementation(kotlin("test"))
