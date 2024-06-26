@@ -46,7 +46,10 @@ class ResultConverterFactory : Converter.Factory {
             return object : Converter.SuspendResponseConverter<HttpResponse, Any> {
                 override suspend fun convert(response: HttpResponse): Any {
                     return try {
-                        Ok<Any>(response.body(typeData.typeArgs.first().typeInfo))
+                        if (response.status.value >= 400) {
+                            Err(TenistaError.RemoteError("${response.status.value}: ${response.status.description}"))
+                        } else
+                            Ok<Any>(response.body(typeData.typeArgs.first().typeInfo))
                     } catch (ex: Throwable) {
                         Err(TenistaError.RemoteError(ex.message ?: "Error desconocido"))
                     }

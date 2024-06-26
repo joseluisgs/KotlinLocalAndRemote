@@ -38,7 +38,7 @@ class TenistasRepositoryLocal(
         logger.debug { "Obteniendo tenista por id: $id en la bd" }
         sqlClient.queries.selectById(id).executeAsOneOrNull()?.let {
             emit(Ok(it.toTenista()))
-        } ?: emit(Err(TenistaError.NotFound(id)))
+        } ?: emit(Err(TenistaError.NotFound("ERROR: No se ha podido obtener el tenista con id $id")))
     }.flowOn(Dispatchers.IO)
 
     override fun save(t: Tenista): Flow<Result<Tenista, TenistaError>> = flow {

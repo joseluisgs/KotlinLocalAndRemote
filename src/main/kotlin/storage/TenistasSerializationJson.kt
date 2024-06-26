@@ -37,7 +37,7 @@ class TenistasSerializationJson : TenistasSerializationStorage {
         Ok(tenistas) // Devolvemos los tenistas
     } catch (e: Exception) {
         logger.error(e) { "Error al leer el fichero: ${file.absolutePath}" }
-        Err(TenistaError.StorageError("Error al leer el fichero ${file.absolutePath}: ${e.message}"))
+        Err(TenistaError.StorageError("ERROR al leer el fichero ${file.absolutePath}: ${e.message}"))
     }
 
 

@@ -23,7 +23,7 @@ class TenistasSerializationCsv : TenistasSerializationStorage {
 
         // Código de lectura del fichero
         if (!file.exists()) {
-            emit(Err(TenistaError.StorageError("El fichero no existe ${file.absolutePath}")))
+            emit(Err(TenistaError.StorageError("ERROR: El fichero no existe ${file.absolutePath}")))
         } else {
             emit(readLines(file))
         }
@@ -63,7 +63,7 @@ class TenistasSerializationCsv : TenistasSerializationStorage {
             )
         } catch (e: Exception) {
             logger.error(e) { "Error al leer el fichero: ${file.absolutePath}" }
-            Err(TenistaError.StorageError("Error al leer el fichero ${file.absolutePath}: ${e.message}"))
+            Err(TenistaError.StorageError("ERROR al leer el fichero ${file.absolutePath}: ${e.message}"))
         }
     }
 
