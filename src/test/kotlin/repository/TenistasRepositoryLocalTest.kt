@@ -1,5 +1,6 @@
 package repository
 
+import app.cash.sqldelight.TransactionWithoutReturn
 import database.DatabaseQueries
 import database.SqlDeLightManager
 import dev.joseluisgs.error.TenistaError
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
 
 @ExtendWith(MockKExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -40,11 +40,12 @@ class TenistasRepositoryLocalTest {
     fun setUpAll() {
         // Es qe hay un init que se hace nada mas crear el objeto
         coEvery { databaseQueries.removeAll() } returns Unit
+
     }
 
 
     private val testTenista = Tenista(
-        id = UUID.randomUUID(),
+        id = 1,
         nombre = "Rafael Nadal",
         pais = "España",
         altura = 185,
@@ -74,7 +75,7 @@ class TenistasRepositoryLocalTest {
     fun `getById debe devolver el tenista correspondiente`() = runBlocking {
         val id = testTenista.id
         coEvery {
-            databaseQueries.selectById(id.toString()).executeAsOneOrNull()
+            databaseQueries.selectById(id).executeAsOneOrNull()
         } returns testTenista.toTenistaEntity()
 
         val result = repository.getById(id).first()
@@ -86,25 +87,41 @@ class TenistasRepositoryLocalTest {
 
     @Test
     fun `getById debe devolver error si el tenista no existe`() = runBlocking {
-        val id = UUID.randomUUID()
+        val id = 1L
         coEvery {
-            databaseQueries.selectById(id.toString()).executeAsOneOrNull()
+            databaseQueries.selectById(id).executeAsOneOrNull()
         } returns null
 
         val result = repository.getById(id).first()
         assertAll(
             { assertTrue(result.isErr) },
-            { assertEquals(TenistaError.NotFound(id.toString()).message, result.error.message) }
+            { assertEquals(TenistaError.NotFound(id).message, result.error.message) }
         )
     }
 
     @Test
     fun `save debe guardar el tenista y devolverlo`() = runBlocking {
+
+        // Cuidado que estamos usando una transacción
+        coEvery {
+            databaseQueries.transaction(
+                noEnclosing = false,
+                any<TransactionWithoutReturn.() -> Unit>()
+            )
+        } coAnswers {
+            it.invocation.args[0]
+        }
+
         coEvery {
             databaseQueries.insert(testTenista.toTenistaEntity())
         } returns Unit
 
+        coEvery {
+            databaseQueries.selectLastInserted().executeAsOne()
+        } returns testTenista.toTenistaEntity()
+
         val result = repository.save(testTenista).first()
+
         assertAll(
             { assertTrue(result.isOk) },
             {
@@ -114,6 +131,7 @@ class TenistasRepositoryLocalTest {
                 )
             }
         )
+
     }
 
     @Test
@@ -122,20 +140,20 @@ class TenistasRepositoryLocalTest {
         val updatedTenista = testTenista.copy(nombre = "Updated Test")
 
         coEvery {
-            databaseQueries.selectById(id.toString()).executeAsOneOrNull()
+            databaseQueries.selectById(id).executeAsOneOrNull()
         } returns testTenista.toTenistaEntity()
 
         coEvery {
             databaseQueries.update(
-                id = id.toString(),
+                id = id,
                 nombre = updatedTenista.nombre,
                 pais = updatedTenista.pais,
                 altura = updatedTenista.altura.toLong(),
                 peso = updatedTenista.peso.toLong(),
                 puntos = updatedTenista.puntos.toLong(),
                 mano = updatedTenista.mano.name,
-                fechaNacimiento = updatedTenista.fechaNacimiento.toString(),
-                updatedAt = any()
+                fecha_nacimiento = updatedTenista.fechaNacimiento.toString(),
+                updated_at = any()
             )
         } returns Unit
 
@@ -153,17 +171,17 @@ class TenistasRepositoryLocalTest {
 
     @Test
     fun `update debe devolver error si el tenista no existe`() = runBlocking {
-        val id = UUID.randomUUID()
+        val id = 1L
         val updatedTenista = testTenista.copy(nombre = "Updated Test Fails")
 
         coEvery {
-            databaseQueries.selectById(id.toString()).executeAsOneOrNull()
+            databaseQueries.selectById(id).executeAsOneOrNull()
         } returns null
 
         val result = repository.update(id, updatedTenista).first()
         assertAll(
             { assertTrue(result.isErr) },
-            { assertEquals(TenistaError.NotFound(id.toString()).message, result.error.message) }
+            { assertEquals(TenistaError.NotFound(id).message, result.error.message) }
         )
     }
 
@@ -172,11 +190,11 @@ class TenistasRepositoryLocalTest {
         val id = testTenista.id
 
         coEvery {
-            databaseQueries.selectById(id.toString()).executeAsOneOrNull()
+            databaseQueries.selectById(id).executeAsOneOrNull()
         } returns testTenista.toTenistaEntity()
 
         coEvery {
-            databaseQueries.delete(id.toString())
+            databaseQueries.delete(id)
         } returns Unit
 
         val result = repository.delete(id).first()
@@ -188,16 +206,16 @@ class TenistasRepositoryLocalTest {
 
     @Test
     fun `delete debe devolver error si el tenista no existe`() = runBlocking {
-        val id = UUID.randomUUID()
+        val id = 1L
 
         coEvery {
-            databaseQueries.selectById(id.toString()).executeAsOneOrNull()
+            databaseQueries.selectById(id).executeAsOneOrNull()
         } returns null
 
         val result = repository.delete(id).first()
         assertAll(
             { assertTrue(result.isErr) },
-            { assertEquals(TenistaError.NotFound(id.toString()).message, result.error.message) }
+            { assertEquals(TenistaError.NotFound(id).message, result.error.message) }
         )
     }
 

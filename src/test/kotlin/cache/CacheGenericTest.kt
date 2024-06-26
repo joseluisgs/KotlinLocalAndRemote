@@ -12,7 +12,7 @@ class CacheGenericTest {
 
     private fun createRandomTenista(): Tenista {
         return Tenista(
-            id = UUID.randomUUID(),
+            id = Random().nextLong(),
             nombre = "Tenista",
             pais = "Pais",
             altura = 180,
@@ -28,7 +28,7 @@ class CacheGenericTest {
 
     @Test
     fun `debe devolver unm elemento existente en la cache en base a su clave`() {
-        val cache = CacheGeneric<UUID, Tenista>(2)
+        val cache = CacheGeneric<Long, Tenista>(2)
         val tenista1 = createRandomTenista()
 
         cache.put(tenista1.id, tenista1)
@@ -49,7 +49,7 @@ class CacheGenericTest {
 
     @Test
     fun `debe introducir elementos en la cache`() {
-        val cache = CacheGeneric<UUID, Tenista>(3)
+        val cache = CacheGeneric<Long, Tenista>(3)
         val tenista1 = createRandomTenista()
         val tenista2 = createRandomTenista()
 
@@ -65,7 +65,7 @@ class CacheGenericTest {
 
     @Test
     fun `debe eliminar un tenista si el limite se supera al introducir`() {
-        val cache = CacheGeneric<UUID, Tenista>(2)
+        val cache = CacheGeneric<Long, Tenista>(2)
         val tenista1 = createRandomTenista()
         val tenista2 = createRandomTenista()
         val tenista3 = createRandomTenista()
@@ -90,7 +90,7 @@ class CacheGenericTest {
 
     @Test
     fun `debe eliminar los elementos de la cache`() {
-        val cache = CacheGeneric<UUID, Tenista>(2)
+        val cache = CacheGeneric<Long, Tenista>(2)
         val tenista1 = createRandomTenista()
         val tenista2 = createRandomTenista()
 
@@ -108,7 +108,7 @@ class CacheGenericTest {
 
     @Test
     fun `debe devolver las claves y valores correctos`() {
-        val cache = CacheGeneric<UUID, Tenista>(2)
+        val cache = CacheGeneric<Long, Tenista>(2)
         val tenista1 = createRandomTenista()
         val tenista2 = createRandomTenista()
 
@@ -123,20 +123,20 @@ class CacheGenericTest {
 
     @Test
     fun `debe comprobar si existe o no un valor en base a su clave`() {
-        val cache = CacheGeneric<UUID, Tenista>(2)
+        val cache = CacheGeneric<Long, Tenista>(2)
         val tenista1 = createRandomTenista()
 
         cache.put(tenista1.id, tenista1)
 
         assertAll(
             { assertTrue(cache.containsKey(tenista1.id)) },
-            { assertFalse(cache.containsKey(UUID.randomUUID())) }
+            { assertFalse(cache.containsKey(-99)) }
         )
     }
 
     @Test
     fun `debe comprobar si existe un valor`() {
-        val cache = CacheGeneric<UUID, Tenista>(2)
+        val cache = CacheGeneric<Long, Tenista>(2)
         val tenista1 = createRandomTenista()
         val tenista2 = createRandomTenista()
 
@@ -150,7 +150,7 @@ class CacheGenericTest {
 
     @Test
     fun `debe comprobar si esta vacía`() {
-        val cache = CacheGeneric<UUID, Tenista>(2)
+        val cache = CacheGeneric<Long, Tenista>(2)
 
         assertAll(
             { assertTrue(cache.isEmpty()) },

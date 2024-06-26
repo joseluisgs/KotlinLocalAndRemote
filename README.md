@@ -97,7 +97,7 @@ En todo momento trabajaremos la asincronía con [Flows](https://kotlinlang.org/d
 [Result](https://github.com/michaelbull/kotlin-result).
 
 Enlace a
-los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/f4cf8d903a9ecb80f36822d870144ea2b8defd57)
+los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/f4cf8d903a9ecb80f36822d870144ea2b8defd57).
 
 ## Cache en Memoria
 
@@ -124,7 +124,7 @@ eliminar el elemento menos
 recientemente usado.
 
 Enlace a
-los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/7003a44892d4c540530e78b31e6123d4c8e882a5)
+los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/7003a44892d4c540530e78b31e6123d4c8e882a5).
 
 ## Repositorio Local
 
@@ -141,4 +141,4 @@ lectura y escritura de datos. Seguimos usando asincronía con Flows y trabajando
 De esta manera hemos podido separar la lógica de la base de datos de la lógica de la aplicación.
 
 Enlace a
-los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/39d0e8c0a2e0fb2c5b6d80fe10b9c50ce1019385)
+los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/39d0e8c0a2e0fb2c5b6d80fe10b9c50ce1019385).

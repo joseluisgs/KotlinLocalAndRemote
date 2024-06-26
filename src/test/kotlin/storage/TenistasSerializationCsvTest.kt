@@ -12,7 +12,6 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.nio.file.Path
 import java.time.LocalDate
-import java.util.*
 import kotlin.test.Test
 
 class TenistasSerializationCsvTest {
@@ -40,8 +39,8 @@ class TenistasSerializationCsvTest {
             writeText(
                 """
                 id,nombre,pais,altura,peso,puntos,mano,fecha_nacimiento
-                550e8400-e29b-41d4-a716-446655440000,Novak Djokovic,Serbia,188,77,12030,DIESTRO,1987-05-22
-                550e8400-e29b-41d4-a716-446655440001,Daniil Medvedev,Rusia,198,83,10370,DIESTRO,1996-02-11
+                1,Novak Djokovic,Serbia,188,77,12030,DIESTRO,1987-05-22
+                2,Daniil Medvedev,Rusia,198,83,10370,DIESTRO,1996-02-11
                 """.trimIndent()
             )
         }
@@ -61,7 +60,7 @@ class TenistasSerializationCsvTest {
         val file = File(tempDir.toFile(), "tenistas_export.csv")
         val tenistas = listOf(
             Tenista(
-                id = UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
+                id = 1L,
                 nombre = "Rafael Nadal",
                 pais = "Spain",
                 altura = 185,
@@ -71,7 +70,7 @@ class TenistasSerializationCsvTest {
                 fechaNacimiento = LocalDate.parse("1981-08-08"),
             ),
             Tenista(
-                id = UUID.fromString("550e8400-e29b-41d4-a716-446655440001"),
+                id = 2L,
                 nombre = "Roger Federer",
                 pais = "Switzerland",
                 altura = 185,
@@ -102,7 +101,7 @@ class TenistasSerializationCsvTest {
         val invalidFile = File("/invalid/path/tenistas_export.csv")
         val tenistas = listOf(
             Tenista(
-                id = UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
+                id = 1,
                 nombre = "Rafael Nadal",
                 pais = "Spain",
                 altura = 185,

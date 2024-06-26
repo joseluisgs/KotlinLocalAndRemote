@@ -2,17 +2,17 @@
 
 -- Tabla de productos
 CREATE TABLE IF NOT EXISTS TenistaEntity (
-    id TEXT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     nombre TEXT NOT NULL,
     pais TEXT NOT NULL,
     altura INTEGER NOT NULL,
     peso INTEGER NOT NULL,
     puntos INTEGER NOT NULL,
     mano TEXT NOT NULL,
-    fechaNacimiento TEXT NOT NULL,
-    createdAt TEXT NOT NULL,
-    updatedAt TEXT NOT NULL,
-    isDeleted INTEGER NOT NULL DEFAULT 0
+    fecha_nacimiento TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    is_deleted INTEGER NOT NULL DEFAULT 0
 );
 
 -- Operaciones
@@ -23,7 +23,7 @@ selectAll:
 SELECT * FROM TenistaEntity;
 
 seletctAllbyIsDeleted:
-SELECT * FROM TenistaEntity WHERE isDeleted = ?;
+SELECT * FROM TenistaEntity WHERE is_deleted = ?;
 
 selectAllOrderByPuntosDesc:
 SELECT * FROM TenistaEntity ORDER BY puntos DESC;
@@ -35,21 +35,21 @@ selectById:
 SELECT * FROM TenistaEntity WHERE id = ?;
 
 selectLastInserted:
+-- Si usamos transacciones para insertar registros, podemos usar la siguiente consulta para obtener el último registro insertado:
 SELECT * FROM TenistaEntity WHERE id = last_insert_rowid();
-
---insert:
---INSERT INTO TenistaEntity (id, nombre, pais, altura, peso, puntos, mano, fechaNacimiento) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+-- Si no queremos usar transacciones para obtener el último registro insertado, podemos usar la siguiente consulta:
+-- SELECT * FROM TenistaEntity WHERE id = (SELECT MAX(id) FROM TenistaEntity);
 
 insert:
-INSERT INTO TenistaEntity (id, nombre, pais, altura, peso, puntos, mano, fechaNacimiento, createdAt, updatedAt, isDeleted) VALUES ?;
+INSERT INTO TenistaEntity (nombre, pais, altura, peso, puntos, mano, fecha_nacimiento, created_at, updated_at, is_deleted) VALUES ?;
 
 update:
-UPDATE TenistaEntity SET nombre = ?, pais = ?, altura = ?, peso = ?, puntos = ?, mano = ?, fechaNacimiento = ?, updatedAt =? WHERE id = ?;
+UPDATE TenistaEntity SET nombre = ?, pais = ?, altura = ?, peso = ?, puntos = ?, mano = ?, fecha_nacimiento = ?, updated_at =? WHERE id = ?;
 
 delete:
 DELETE FROM TenistaEntity WHERE id = ?;
 
 deleteLogic:
-UPDATE TenistaEntity SET isDeleted = 1, updatedAt = ? WHERE id = ?;
+UPDATE TenistaEntity SET is_deleted = 1, updated_at = ? WHERE id = ?;
 
 

@@ -70,7 +70,7 @@ class TenistasSerializationCsv : TenistasSerializationStorage {
     private fun parseLine(parts: List<String>): Tenista {
         logger.debug { "Parseando línea: $parts" }
         return TenistaDto(
-            id = parts[0],
+            id = parts[0].toLong(),
             nombre = parts[1],
             pais = parts[2],
             altura = parts[3].toInt(),

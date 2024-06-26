@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import org.lighthousegames.logging.logging
 import java.time.LocalDateTime
-import java.util.*
 
 
 private val logger = logging()
@@ -35,37 +34,40 @@ class TenistasRepositoryLocal(
         emit(Ok(sqlClient.queries.selectAllOrderByPuntosDesc().executeAsList().map { it.toTenista() }))
     }.flowOn(Dispatchers.IO)
 
-    override fun getById(id: UUID): Flow<Result<Tenista, TenistaError>> = flow {
+    override fun getById(id: Long): Flow<Result<Tenista, TenistaError>> = flow {
         logger.debug { "Obteniendo tenista por id: $id" }
-        sqlClient.queries.selectById(id.toString()).executeAsOneOrNull()?.let {
+        sqlClient.queries.selectById(id).executeAsOneOrNull()?.let {
             emit(Ok(it.toTenista()))
-        } ?: emit(Err(TenistaError.NotFound(id.toString())))
+        } ?: emit(Err(TenistaError.NotFound(id)))
     }.flowOn(Dispatchers.IO)
 
-    override fun save(t: Tenista): Flow<Result<Tenista, TenistaError>> = flow<Result<Tenista, TenistaError>> {
+    override fun save(t: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
         logger.debug { "Guardando tenista: $t" }
         val timeSpam = LocalDateTime.now()
-        sqlClient.queries.insert(t.toTenistaEntity())
-        emit(
-            Ok(t.copy(createdAt = timeSpam, updatedAt = timeSpam))
-        )
+        // Hacemos una transacción para poder obtener el id del tenista guardado
+        sqlClient.queries.transaction {
+            sqlClient.queries.insert(t.copy(createdAt = timeSpam, updatedAt = timeSpam).toTenistaEntity())
+        }
+        // Consultamos el tenista guardado (segun la implementación de SQLDelight usamos transactions)
+        val new = sqlClient.queries.selectLastInserted().executeAsOne().toTenista()
+        emit(Ok(new))
     }.flowOn(Dispatchers.IO)
 
-    override fun update(id: UUID, t: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
+    override fun update(id: Long, t: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
         logger.debug { "Actualizando tenista por id: $id" }
         val timestamp = LocalDateTime.now()
         emit(getById(id).first().mapBoth(
             success = { tenista ->
                 sqlClient.queries.update(
-                    id = id.toString(),
+                    id = id,
                     nombre = t.nombre,
                     pais = t.pais,
                     altura = t.altura.toLong(),
                     peso = t.peso.toLong(),
                     puntos = t.puntos.toLong(),
                     mano = t.mano.name,
-                    fechaNacimiento = t.fechaNacimiento.toString(),
-                    updatedAt = timestamp.toString()
+                    fecha_nacimiento = t.fechaNacimiento.toString(),
+                    updated_at = timestamp.toString()
                 )
                 Ok(t.copy(createdAt = tenista.createdAt, updatedAt = timestamp))
             },
@@ -74,11 +76,11 @@ class TenistasRepositoryLocal(
 
     }.flowOn(Dispatchers.IO)
 
-    override fun delete(id: UUID): Flow<Result<Tenista, TenistaError>> = flow {
+    override fun delete(id: Long): Flow<Result<Tenista, TenistaError>> = flow {
         logger.debug { "Borrando lógico tenista por id: $id" }
         emit(getById(id).first().mapBoth(
             success = { tenista ->
-                sqlClient.queries.delete(id.toString())
+                sqlClient.queries.delete(id)
                 Ok(tenista.copy(updatedAt = LocalDateTime.now(), isDeleted = true))
             },
             failure = { error -> Err(error) }

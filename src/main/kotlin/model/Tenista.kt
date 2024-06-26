@@ -2,10 +2,9 @@ package dev.joseluisgs.models
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
 
 data class Tenista(
-    val id: UUID = UUID.randomUUID(),
+    val id: Long = NEW_ID,
     val nombre: String,
     val pais: String,
     val altura: Int,
@@ -17,6 +16,11 @@ data class Tenista(
     val updatedAt: LocalDateTime = LocalDateTime.now(),
     val isDeleted: Boolean = false,
 ) {
+
+    companion object {
+        val NEW_ID = -1L
+    }
+
     enum class Mano {
         DIESTRO,
         ZURDO

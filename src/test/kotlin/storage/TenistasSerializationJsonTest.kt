@@ -12,7 +12,6 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.nio.file.Path
 import java.time.LocalDate
-import java.util.*
 import kotlin.test.Test
 
 class TenistasSerializationJsonTest {
@@ -41,28 +40,28 @@ class TenistasSerializationJsonTest {
                 """
                 [
                     {
-                        "id": "550e8400-e29b-41d4-a716-446655440000",
+                        "id": "1",
                         "nombre": "Novak Djokovic",
                         "pais": "Serbia",
                         "altura": 188,
                         "peso": 77,
                         "puntos": 12030,
                         "mano": "DIESTRO",
-                        "fechaNacimiento": "1987-05-22",
-                        "createdAt": "2024-06-25T17:49:35.094296800",
-                        "updatedAt": "2024-06-25T17:49:35.094296800"
+                        "fecha_nacimiento": "1987-05-22",
+                        "created_at": "2024-06-25T17:49:35.094296800",
+                        "updated_at": "2024-06-25T17:49:35.094296800"
                     },
                     {
-                        "id": "550e8400-e29b-41d4-a716-446655440001",
+                        "id": "2",
                         "nombre": "Daniil Medvedev",
                         "pais": "Rusia",
                         "altura": 198,
                         "peso": 83,
                         "puntos": 10370,
                         "mano": "DIESTRO",
-                        "fechaNacimiento": "1996-02-11",
-                        "createdAt": "2024-06-25T17:49:35.094296800",
-                        "updatedAt": "2024-06-25T17:49:35.094296800"
+                        "fecha_nacimiento": "1996-02-11",
+                        "created_at": "2024-06-25T17:49:35.094296800",
+                        "updated_at": "2024-06-25T17:49:35.094296800"
                     }
                ]
                """.trimIndent()
@@ -84,7 +83,7 @@ class TenistasSerializationJsonTest {
         val file = File(tempDir.toFile(), "tenistas_export.json")
         val tenistas = listOf(
             Tenista(
-                id = UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
+                id = 1,
                 nombre = "Rafael Nadal",
                 pais = "Spain",
                 altura = 185,
@@ -94,7 +93,7 @@ class TenistasSerializationJsonTest {
                 fechaNacimiento = LocalDate.parse("1981-08-08"),
             ),
             Tenista(
-                id = UUID.fromString("550e8400-e29b-41d4-a716-446655440001"),
+                id = 2,
                 nombre = "Roger Federer",
                 pais = "Switzerland",
                 altura = 185,
@@ -125,7 +124,7 @@ class TenistasSerializationJsonTest {
         val invalidFile = File("/invalid/path/tenistas_export.json")
         val tenistas = listOf(
             Tenista(
-                id = UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
+                id = 1,
                 nombre = "Rafael Nadal",
                 pais = "Spain",
                 altura = 185,

@@ -6,15 +6,24 @@ import database.SqlDeLightManager
 import database.createDatabase
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.repository.TenistasRepositoryLocal
+import dev.joseluisgs.rest.KtorFitClient
 import dev.joseluisgs.storage.TenistasSerializationCsv
 import dev.joseluisgs.storage.TenistasSerializationJson
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import java.util.*
 import kotlin.io.path.Path
 
 fun main(): Unit = runBlocking {
     println("Hola Tenistas!")
+
+    val restClient = KtorFitClient()
+    val tenistas = restClient.client.getAll()
+    if (tenistas.isSuccessful) {
+        println("Tenistas obtenidos: ${tenistas.body()}")
+    } else {
+        println("Error obteniendo tenistas: ${tenistas.errorBody()}")
+    }
+
     val tenistasCsv = TenistasSerializationCsv()
 
     // Prueba de importación de tenistas desde CSV
@@ -61,7 +70,7 @@ fun main(): Unit = runBlocking {
     val tenistasRepositoryLocal = TenistasRepositoryLocal(SqlDeLightManager(createDatabase("tenistas.db")))
 
     // Insertamos un tenista
-    tenistasRepositoryLocal.save(misTenistas.first()).first()
+    tenistasRepositoryLocal.save(misTenistas.first().copy(id = Tenista.NEW_ID)).first()
         .onSuccess { tenista ->
             println("Tenista insertado: $tenista")
         }.onFailure { error ->
@@ -85,7 +94,7 @@ fun main(): Unit = runBlocking {
         }
 
     // Seleccionamos un tenista que no existe
-    tenistasRepositoryLocal.getById(UUID.randomUUID()).first()
+    tenistasRepositoryLocal.getById(-1).first()
         .onSuccess { tenista ->
             println("Tenista seleccionado: $tenista")
         }.onFailure { error ->
@@ -110,7 +119,7 @@ fun main(): Unit = runBlocking {
         }
 
     // Actualizamos un tenista que no existe
-    tenistasRepositoryLocal.update(UUID.randomUUID(), tenistaForUpdate).first()
+    tenistasRepositoryLocal.update(-1, tenistaForUpdate).first()
         .onSuccess { tenista ->
             println("Tenista actualizado: $tenista")
         }.onFailure { error ->
@@ -134,7 +143,7 @@ fun main(): Unit = runBlocking {
         }
 
     // Borramos un tenista que no existe
-    tenistasRepositoryLocal.delete(UUID.randomUUID()).first()
+    tenistasRepositoryLocal.delete(-1).first()
         .onSuccess { tenista ->
             println("Tenista borrado: $tenista")
         }.onFailure { error ->

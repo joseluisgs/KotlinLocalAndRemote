@@ -31,7 +31,7 @@ class TenistasSerializationJson : TenistasSerializationStorage {
 
     private fun readLines(file: File): Result<List<Tenista>, TenistaError> = try {
         // Creamos el serializador de JSON
-        val json = Json { ignoreUnknownKeys = true; encodeDefaults = false }
+        val json = Json { ignoreUnknownKeys = true; encodeDefaults = false; isLenient = true }
         // Leemos el fichero y lo convertimos a Tenista
         val tenistas = json.decodeFromString<List<TenistaDto>>(file.readText()).map { it.toTenista() }
         Ok(tenistas) // Devolvemos los tenistas

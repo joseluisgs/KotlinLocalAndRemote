@@ -1,7 +1,6 @@
 package dev.joseluisgs.cache
 
 import dev.joseluisgs.models.Tenista
-import java.util.UUID
 
 /**
  * Implementación de una cache simple para Tenistas basada en la Generica
@@ -10,4 +9,4 @@ import java.util.UUID
  */
 class TenistasCache(
     private val size: Int = 10
-) : CacheGeneric<UUID, Tenista>(size)
+) : CacheGeneric<Long, Tenista>(size)

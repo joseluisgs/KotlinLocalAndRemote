@@ -3,6 +3,7 @@ package dev.joseluisgs.mapper
 import database.TenistaEntity
 import dev.joseluisgs.dto.TenistaDto
 import dev.joseluisgs.models.Tenista
+import java.time.LocalDate
 import java.time.LocalDateTime.now
 import java.time.LocalDateTime.parse
 
@@ -17,14 +18,14 @@ import java.time.LocalDateTime.parse
  */
 fun TenistaDto.toTenista(): Tenista {
     return Tenista(
-        id = java.util.UUID.fromString(this.id),
+        id = this.id.toLong(),
         nombre = this.nombre,
         pais = this.pais,
         altura = this.altura,
         peso = this.peso,
         puntos = this.puntos,
         mano = Tenista.Mano.valueOf(this.mano),
-        fechaNacimiento = java.time.LocalDate.parse(this.fechaNacimiento),
+        fechaNacimiento = LocalDate.parse(this.fechaNacimiento),
         createdAt = this.createdAt?.let { parse(it) } ?: now(),
         updatedAt = this.updatedAt?.let { parse(it) } ?: now(),
         isDeleted = this.isDeleted ?: false
@@ -37,7 +38,7 @@ fun TenistaDto.toTenista(): Tenista {
  */
 fun Tenista.toTenistaDto(): TenistaDto {
     return TenistaDto(
-        id = this.id.toString(),
+        id = this.id,
         nombre = this.nombre,
         pais = this.pais,
         altura = this.altura,
@@ -57,17 +58,17 @@ fun Tenista.toTenistaDto(): TenistaDto {
  */
 fun TenistaEntity.toTenista(): Tenista {
     return Tenista(
-        id = java.util.UUID.fromString(this.id),
+        id = this.id,
         nombre = this.nombre,
         pais = this.pais,
         altura = this.altura.toInt(),
         peso = this.peso.toInt(),
         puntos = this.puntos.toInt(),
         mano = Tenista.Mano.valueOf(this.mano),
-        fechaNacimiento = java.time.LocalDate.parse(this.fechaNacimiento),
-        createdAt = parse(this.createdAt),
-        updatedAt = parse(this.updatedAt),
-        isDeleted = this.isDeleted.toInt() == 1
+        fechaNacimiento = LocalDate.parse(this.fecha_nacimiento),
+        createdAt = parse(this.created_at),
+        updatedAt = parse(this.updated_at),
+        isDeleted = this.is_deleted.toInt() == 1
     )
 }
 
@@ -77,16 +78,16 @@ fun TenistaEntity.toTenista(): Tenista {
  */
 fun Tenista.toTenistaEntity(): TenistaEntity {
     return TenistaEntity(
-        id = this.id.toString(),
+        id = this.id,
         nombre = this.nombre,
         pais = this.pais,
         altura = this.altura.toLong(),
         peso = this.peso.toLong(),
         puntos = this.puntos.toLong(),
         mano = this.mano.name,
-        fechaNacimiento = this.fechaNacimiento.toString(),
-        createdAt = this.createdAt.toString(),
-        updatedAt = this.updatedAt.toString(),
-        isDeleted = if (this.isDeleted) 1L else 0L
+        fecha_nacimiento = this.fechaNacimiento.toString(),
+        created_at = this.createdAt.toString(),
+        updated_at = this.updatedAt.toString(),
+        is_deleted = if (this.isDeleted) 1L else 0L
     )
 }
