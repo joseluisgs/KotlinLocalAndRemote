@@ -32,6 +32,8 @@ dependencies {
     testImplementation(kotlin("test"))
     // Para testear coroutines
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+    // Para Mockear con Movkk
+    testImplementation("io.mockk:mockk:1.13.11")
 }
 
 tasks.test {

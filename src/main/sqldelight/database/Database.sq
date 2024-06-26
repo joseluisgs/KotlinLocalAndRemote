@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS TenistaEntity (
     puntos INTEGER NOT NULL,
     mano TEXT NOT NULL,
     fechaNacimiento TEXT NOT NULL,
-    createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    createdAt TEXT NOT NULL,
+    updatedAt TEXT NOT NULL,
     isDeleted INTEGER NOT NULL DEFAULT 0
 );
 
@@ -28,25 +28,28 @@ SELECT * FROM TenistaEntity WHERE isDeleted = ?;
 selectAllOrderByPuntosDesc:
 SELECT * FROM TenistaEntity ORDER BY puntos DESC;
 
+selectPaginated:
+SELECT * FROM TenistaEntity LIMIT ? OFFSET ?;
+
 selectById:
 SELECT * FROM TenistaEntity WHERE id = ?;
 
 selectLastInserted:
 SELECT * FROM TenistaEntity WHERE id = last_insert_rowid();
 
-insert:
-INSERT INTO TenistaEntity (id, nombre, pais, altura, peso, puntos, mano, fechaNacimiento) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+--insert:
+--INSERT INTO TenistaEntity (id, nombre, pais, altura, peso, puntos, mano, fechaNacimiento) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
-insertTenista:
-INSERT INTO TenistaEntity (id, nombre, pais, altura, peso, puntos, mano, fechaNacimiento) VALUES ?;
+insert:
+INSERT INTO TenistaEntity (id, nombre, pais, altura, peso, puntos, mano, fechaNacimiento, createdAt, updatedAt, isDeleted) VALUES ?;
 
 update:
-UPDATE TenistaEntity SET nombre = ?, pais = ?, altura = ?, peso = ?, puntos = ?, mano = ?, fechaNacimiento = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?;
+UPDATE TenistaEntity SET nombre = ?, pais = ?, altura = ?, peso = ?, puntos = ?, mano = ?, fechaNacimiento = ?, updatedAt =? WHERE id = ?;
 
 delete:
 DELETE FROM TenistaEntity WHERE id = ?;
 
 deleteLogic:
-UPDATE TenistaEntity SET isDeleted = 1, updatedAt = CURRENT_TIMESTAMP WHERE id = ?;
+UPDATE TenistaEntity SET isDeleted = 1, updatedAt = ? WHERE id = ?;
 
 
