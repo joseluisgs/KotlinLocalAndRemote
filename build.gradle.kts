@@ -4,6 +4,10 @@ plugins {
     kotlin("plugin.serialization") version "1.9.23"
     // SqlDelight
     id("app.cash.sqldelight") version "2.0.2"
+    // KSP de Google
+    id("com.google.devtools.ksp") version "1.9.23-1.0.20"
+    // Ktorfit
+    id("de.jensklingenberg.ktorfit") version "1.13.0"
 }
 
 group = "dev.joseluisgs"
@@ -27,6 +31,14 @@ dependencies {
     implementation("app.cash.sqldelight:sqlite-driver:2.0.2")
     // SqlDelight Coroutines Extensions
     // implementation("app.cash.sqldelight:coroutines-extensions:2.0.2")
+    // Ktorfit
+    implementation("de.jensklingenberg.ktorfit:ktorfit-lib:1.13.0")
+    ksp("de.jensklingenberg.ktorfit:ktorfit-ksp:1.13.0")
+    // Ktor client opciones
+    // Para serializar en Json con Ktor
+    implementation("io.ktor:ktor-client-serialization:2.3.10")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.10")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.10")
 
     // Para test
     testImplementation(kotlin("test"))
