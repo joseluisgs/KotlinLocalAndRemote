@@ -74,15 +74,14 @@ class TenistasRepositoryRemoteTest {
 
     @Test
     fun `getAll debe devolver error si falla`() = runTest {
-        val errorMessage = "Error message"
-        coEvery { restClient.getAll() } returns Err(TenistaError.RemoteError(errorMessage))
+        coEvery { restClient.getAll() } returns Err(TenistaError.ApiError(400, "Error message"))
 
         val result = repository.getAll().first()
 
         assertAll(
             { assertTrue(result.isErr) },
             { assertTrue(result.error is TenistaError.RemoteError) },
-            { assertEquals("${errorMessage}, no se ha podido obtener la lista de tenistas", result.error.message) }
+            { assertTrue(result.error.message.contains("400 Error message")) }
         )
     }
 
@@ -102,15 +101,14 @@ class TenistasRepositoryRemoteTest {
 
     @Test
     fun `getById debe devolver error si falla`() = runTest {
-        val errorMessage = "Error message"
-        coEvery { restClient.getById(1L) } returns Err(TenistaError.RemoteError(errorMessage))
+        coEvery { restClient.getById(1L) } returns Err(TenistaError.ApiError(404, "Not Found"))
 
         val result = repository.getById(1L).first()
 
         assertAll(
             { assertTrue(result.isErr) },
             { assertTrue(result.error is TenistaError.RemoteError) },
-            { assertEquals("${errorMessage}, no se ha podido obtener el tenista con id 1", result.error.message) }
+            { assertTrue(result.error.message.contains("404 Not Found")) }
         )
     }
 
@@ -130,16 +128,15 @@ class TenistasRepositoryRemoteTest {
 
     @Test
     fun `save debe devolver error si falla`() = runTest {
-        val errorMessage = "Error message"
 
-        coEvery { restClient.save(testTenista.toTenistaDto()) } returns Err(TenistaError.RemoteError(errorMessage))
+        coEvery { restClient.save(testTenista.toTenistaDto()) } returns Err(TenistaError.ApiError(400, "Error message"))
 
         val result = repository.save(testTenista).first()
 
         assertAll(
             { assertTrue(result.isErr) },
             { assertTrue(result.error is TenistaError.RemoteError) },
-            { assertEquals("${errorMessage}, no se ha podido guardar el tenista $testTenista", result.error.message) }
+            { assertTrue(result.error.message.contains("400 Error message")) }
         )
 
         coVerify(atLeast = 1) { restClient.save(testTenista.toTenistaDto()) }
@@ -161,21 +158,19 @@ class TenistasRepositoryRemoteTest {
 
     @Test
     fun `update debe devolver error si falla`() = runTest {
-        val errorMessage = "Error message"
-
         coEvery {
             restClient.update(
                 1L,
                 testTenista.toTenistaDto()
             )
-        } returns Err(TenistaError.RemoteError(errorMessage))
+        } returns Err(TenistaError.ApiError(400, "Error message"))
 
         val result = repository.update(1L, testTenista).first()
 
         assertAll(
             { assertTrue(result.isErr) },
             { assertTrue(result.error is TenistaError.RemoteError) },
-            { assertEquals("${errorMessage}, no se ha podido actualizar el tenista con id 1", result.error.message) }
+            { assertTrue(result.error.message.contains("400 Error message")) }
         )
 
         coVerify(atLeast = 1) { restClient.update(1L, testTenista.toTenistaDto()) }
@@ -197,15 +192,14 @@ class TenistasRepositoryRemoteTest {
 
     @Test
     fun `delete debe devolver error si falla`() = runTest {
-        val errorMessage = "Error message"
-        coEvery { restClient.delete(1L) } returns Err(TenistaError.RemoteError(errorMessage))
+        coEvery { restClient.delete(1L) } returns Err(TenistaError.ApiError(400, "Error message"))
 
         val result = repository.delete(1L).first()
 
         assertAll(
             { assertTrue(result.isErr) },
             { assertTrue(result.error is TenistaError.RemoteError) },
-            { assertEquals("${errorMessage}, no se ha podido guardar el tenista con id 1", result.error.message) }
+            { assertTrue(result.error.message.contains("400 Error message")) }
         )
 
         coVerify(atLeast = 1) { restClient.delete(1L) }

@@ -142,3 +142,22 @@ De esta manera hemos podido separar la lógica de la base de datos de la lógica
 
 Enlace a
 los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/39d0e8c0a2e0fb2c5b6d80fe10b9c50ce1019385).
+
+## Repositorio Remoto
+
+Para la realización del repositorio remoto, hemos usado [KtorFit](https://foso.github.io/Ktorfit/), una librería que nos
+permite realizar peticiones a
+una API REST de forma sencilla y eficiente basada en Ktor y cogiendo las ideas de Retrofit.
+
+Para ello, hemos creado una interfaz para definir las operaciones de la API REST y una implementación de un repositorio
+donde
+usando KtorFit realizamos las peticiones a la API REST.
+
+Una de las ventajas de KtorFit es que nos permite definir las operaciones de la API REST de forma sencilla y eficiente
+de manera asíncrona. Por otro lado
+nos permite definir el tipo de resultado que queremos: Response, Flow, etc. o definir el nuestro propio, como es el caso
+que hemos hecho implementando
+nuestra propia respuesta basada en Result y seguir con la filosofía de ROP.
+
+Enlace a
+los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/f519fb861d60298c88eb64e578206fcd3c31dacd).
