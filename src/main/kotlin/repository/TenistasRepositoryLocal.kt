@@ -38,7 +38,7 @@ class TenistasRepositoryLocal(
         logger.debug { "Obteniendo tenista por id: $id en la bd" }
         sqlClient.queries.selectById(id).executeAsOneOrNull()?.let {
             emit(Ok(it.toTenista()))
-        } ?: emit(Err(TenistaError.NotFound("ERROR: No se ha podido obtener el tenista con id $id")))
+        } ?: emit(Err(TenistaError.NotFound(id)))
     }.flowOn(Dispatchers.IO)
 
     override fun save(t: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
@@ -79,7 +79,7 @@ class TenistasRepositoryLocal(
     override fun delete(id: Long): Flow<Result<Unit, TenistaError>> = flow {
         logger.debug { "Borrando lógico tenista por id: $id en la bd" }
         emit(getById(id).first().mapBoth(
-            success = { tenista ->
+            success = {
                 sqlClient.queries.delete(id)
                 Ok(Unit)
             },

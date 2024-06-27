@@ -22,7 +22,7 @@ class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : Tenist
         logger.debug { "Obteniendo todos los tenistas de la api rest" }
         restClient.getAll().mapBoth(
             success = { emit(Ok(it.map { dto -> dto.toTenista() })) },
-            failure = { emit(Err(TenistaError.RemoteError("No se han podido obtener la lista de tenistas, ${it.message}"))) }
+            failure = { emit(Err(TenistaError.RemoteError("${it.message}, no se ha podido obtener la lista de tenistas"))) }
         )
 
     }.flowOn(Dispatchers.IO)
@@ -31,7 +31,7 @@ class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : Tenist
         logger.debug { "Obteniendo tenista con id $id de la api rest" }
         restClient.getById(id).mapBoth(
             success = { emit(Ok(it.toTenista())) },
-            failure = { emit(Err(TenistaError.RemoteError("ERROR: No se ha podido obtener el tenista con id $id, ${it.message}"))) }
+            failure = { emit(Err(TenistaError.RemoteError("${it.message}, no se ha podido obtener el tenista con id $id"))) }
         )
 
     }.flowOn(Dispatchers.IO)
@@ -40,7 +40,7 @@ class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : Tenist
         logger.debug { "Guardando tenista en la api rest" }
         restClient.save(t.toTenistaDto()).mapBoth(
             success = { emit(Ok(it.toTenista())) },
-            failure = { emit(Err(TenistaError.RemoteError("ERROR: No se ha podido guardar el tenista, ${it.message}"))) }
+            failure = { emit(Err(TenistaError.RemoteError("${it.message}, no se ha podido guardar el tenista $t"))) }
         )
     }.flowOn(Dispatchers.IO)
 
@@ -48,7 +48,7 @@ class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : Tenist
         logger.debug { "Actualizando tenista con id $id en la api rest" }
         restClient.update(id, t.toTenistaDto()).mapBoth(
             success = { emit(Ok(it.toTenista())) },
-            failure = { emit(Err(TenistaError.RemoteError("ERROR: No se ha podido actualizar el tenista con id $id, ${it.message}"))) }
+            failure = { emit(Err(TenistaError.RemoteError("${it.message}, no se ha podido actualizar el tenista con id $id"))) }
         )
     }.flowOn(Dispatchers.IO)
 
@@ -56,7 +56,7 @@ class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : Tenist
         logger.debug { "Borrando tenista con id $id en la api rest" }
         restClient.delete(id).mapBoth(
             success = { emit(Ok(Unit)) },
-            failure = { emit(Err(TenistaError.RemoteError("ERROR: No se ha podido borrar el tenista con id $id, ${it.message}"))) }
+            failure = { emit(Err(TenistaError.RemoteError("${it.message}, no se ha podido guardar el tenista con id $id"))) }
         )
     }.flowOn(Dispatchers.IO)
 }

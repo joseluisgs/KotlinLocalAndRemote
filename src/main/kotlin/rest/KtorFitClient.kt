@@ -47,11 +47,11 @@ class ResultConverterFactory : Converter.Factory {
                 override suspend fun convert(response: HttpResponse): Any {
                     return try {
                         if (response.status.value >= 400) {
-                            Err(TenistaError.RemoteError("${response.status.value}: ${response.status.description}"))
+                            Err(TenistaError.ApiError(response.status.value, response.status.description))
                         } else
                             Ok<Any>(response.body(typeData.typeArgs.first().typeInfo))
                     } catch (ex: Throwable) {
-                        Err(TenistaError.RemoteError(ex.message ?: "Error desconocido"))
+                        Err(TenistaError.ApiError(0, ex.message ?: "Error desconocido"))
                     }
                 }
             }
