@@ -50,24 +50,18 @@ class TenistasServiceImpl(
         // Lanzamos una corutina para que se ejecute en segundo plano
         do {
             logger.debug { "Refrescando el repositorio local con los datos remotos " }
-            // Obtenemos los datos remotos
-            localRepository.removeAll().first().andThen {
-                remoteRepository.getAll().first()
-            }.andThen {
-                localRepository.saveAll(it).first()
-            }.onFailure {
-                logger.error { "Error al refrescar los datos: ${it.message}" }
-            }.also {
-                // Enviamos la notificación de refresco
-                notificationsService.send(
-                    Notification(
-                        type = Notification.Type.REFRESH,
-                        message = "Nuevos datos disponibles: ${it.value}"
+            localRepository.removeAll().first() // Borramos los datos locales
+                .andThen { remoteRepository.getAll().first() } // Obtenemos los datos remotos
+                .andThen { localRepository.saveAll(it).first() }.also {
+                    // Enviamos la notificación de refresco
+                    notificationsService.send(
+                        Notification(
+                            type = Notification.Type.REFRESH,
+                            message = "Nuevos datos disponibles: ${it.value}"
+                        )
                     )
-                )
-                // borramos la cache
-                cache.clear()
-            }
+                    cache.clear() // Limpiamos la cache
+                }
             delay(REFRESH_TIME)
         } while (true)
     }
@@ -94,9 +88,7 @@ class TenistasServiceImpl(
                 },
                 failure = {
                     // Si no está en local, lo buscamos en remoto, lo guardamos en local y lo metemos en la cache
-                    remoteRepository.getById(id).first().andThen {
-                        localRepository.save(it).first()
-                    }.mapBoth(
+                    remoteRepository.getById(id).first().andThen { localRepository.save(it).first() }.mapBoth(
                         success = {
                             cache.put(it.id, it)
                             emit(Ok(it))
@@ -111,82 +103,102 @@ class TenistasServiceImpl(
     override fun save(tenista: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
         logger.debug { "Guardando tenista: $tenista" }
         // validamos
-        tenista.validate().andThen {
-            // Guardamos en remoto
-            remoteRepository.save(tenista).first()
-        }.andThen {
-            // Guardamos en local
-            localRepository.save(it).first()
-        }.mapBoth(
-            success = {
-                // Enviamos la notificación de creación
-                cache.put(it.id, it)
-                notificationsService.send(
-                    Notification(
-                        type = Notification.Type.CREATE,
-                        item = it,
-                        message = "Nuevo tenista creado con id: ${it.id}"
+        tenista.validate()
+            .andThen { remoteRepository.save(tenista).first() }
+            .andThen { localRepository.save(it).first() }.mapBoth(
+                success = {
+                    // Enviamos la notificación de creación
+                    cache.put(it.id, it)
+                    notificationsService.send(
+                        Notification(
+                            type = Notification.Type.CREATE,
+                            item = it,
+                            message = "Nuevo tenista creado con id: ${it.id}"
+                        )
                     )
-                )
-                emit(Ok(it))
-            },
-            failure = { emit(Err(it)) }
-        )
+                    emit(Ok(it))
+                },
+                failure = { emit(Err(it)) }
+            )
     }.flowOn(Dispatchers.IO)
 
     override fun update(id: Long, tenista: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
         logger.debug { "Actualizando tenista por id: $id" }
         // validamos
-        tenista.validate().andThen {
-            // Actualizamos en remoto
-            remoteRepository.update(id, tenista).first()
-        }.andThen {
-            // Actualizamos en local
-            localRepository.update(id, it).first()
-        }.mapBoth(
-            success = {
-                // Enviamos la notificación de actualización
-                cache.put(it.id, it)
-                notificationsService.send(
-                    Notification(
-                        type = Notification.Type.UPDATE,
-                        item = it,
-                        message = "Tenista actualizado con id: ${it.id}"
+        tenista.validate()
+            .andThen { getById(id).first() }
+            .andThen { remoteRepository.update(id, tenista).first() }
+            .andThen { localRepository.update(id, tenista).first() }.mapBoth(
+                success = {
+                    // Enviamos la notificación de actualización
+                    cache.put(it.id, it)
+                    notificationsService.send(
+                        Notification(
+                            type = Notification.Type.UPDATE,
+                            item = it,
+                            message = "Tenista actualizado con id: ${it.id}"
+                        )
                     )
-                )
-                emit(Ok(it))
-            },
-            failure = { emit(Err(it)) }
-        )
+                    emit(Ok(it))
+                },
+                failure = { emit(Err(it)) }
+            )
     }.flowOn(Dispatchers.IO)
 
     override fun delete(id: Long): Flow<Result<Unit, TenistaError>> = flow {
         logger.debug { "Borrando tenista por id: $id" }
-        // Borramos en remoto
-        remoteRepository.delete(id).first().andThen {
-            // Borramos en local
-            localRepository.delete(id).first()
-        }.mapBoth(
-            success = {
-                // Enviamos la notificación de borrado
-                notificationsService.send(
-                    Notification(
-                        type = Notification.Type.DELETE,
-                        message = "Tenista borrado con id: $id"
+
+        getById(id).first()
+            .andThen { remoteRepository.delete(id).first() }
+            .andThen { localRepository.delete(id).first() }.mapBoth(
+                success = {
+                    // Enviamos la notificación de borrado
+                    notificationsService.send(
+                        Notification(
+                            type = Notification.Type.DELETE,
+                            message = "Tenista borrado con id: $id"
+                        )
                     )
-                )
-                emit(Ok(Unit))
-            },
-            failure = { emit(Err(it)) }
-        )
+                    emit(Ok(Unit))
+                },
+                failure = { emit(Err(it)) }
+            )
     }.flowOn(Dispatchers.IO)
 
 
-    override fun import(file: File): Flow<Result<Int, TenistaError>> {
+    override fun import(file: File): Flow<Result<Int, TenistaError>> = flow {
+        logger.debug { "Importando tenistas desde fichero: ${file.name}" }
+        // Debemos saber si la extensión es CSV o JSON si no error
+        when (file.extension.lowercase()) {
+            "csv" -> importCsv(file)
+            "json" -> importJson(file)
+            else -> emit(Err(TenistaError.StorageError("Formato de fichero de importación no soportado")))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    private fun importCsv(file: File) {
+        TODO("Not yet implemented")
+    }
+
+    private fun importJson(file: File) {
         TODO("Not yet implemented")
     }
 
     override fun export(file: File): Flow<Result<Int, TenistaError>> {
+        logger.debug { "Exportando tenistas a fichero: ${file.name}" }
+        // Debemos saber si la extensión es CSV o JSON si no error
+        return when (file.extension.lowercase()) {
+            "csv" -> exportCsv(file)
+            "json" -> exportJson(file)
+            else -> flow { emit(Err(TenistaError.StorageError("Formato de fichero de exportación no soportado"))) }
+        }.flowOn(Dispatchers.IO)
+    }
+
+    private fun exportCsv(file: File): Flow<Result<Int, TenistaError>> {
+        TODO("Not yet implemented")
+    }
+
+    private fun exportJson(file: File): Flow<Result<Int, TenistaError>> {
         TODO("Not yet implemented")
     }
 }
