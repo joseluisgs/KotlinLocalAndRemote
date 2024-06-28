@@ -19,7 +19,7 @@ import kotlin.coroutines.CoroutineContext
 
 
 private val logger = logging()
-private const val REFRESH_TIME = 5000L // 5 segundos
+private const val REFRESH_TIME = 15000L // 15 segundos
 
 class TenistasServiceImpl(
     private val localRepository: TenistasRepositoryLocal,
@@ -67,10 +67,23 @@ class TenistasServiceImpl(
     }
 
 
-    override fun getAll(): Flow<Result<List<Tenista>, TenistaError>> = flow {
+    override fun getAll(fromRemote: Boolean): Flow<Result<List<Tenista>, TenistaError>> = flow {
         logger.debug { "Obteniendo todos los tenistas" }
         // Devolvemos los datos locales
-        emit(localRepository.getAll().first())
+        if (!fromRemote) {
+            localRepository.getAll().first().mapBoth(
+                success = { emit(Ok(it)) },
+                failure = { emit(Err(it)) }
+            )
+        } else {
+            // Devolvemos los datos remotos
+            remoteRepository.getAll().first().mapBoth(
+                success = { emit(Ok(it)) },
+                failure = {
+                    emit(Err(it))
+                }
+            )
+        }
     }.flowOn(Dispatchers.IO)
 
     override fun getById(id: Long): Flow<Result<Tenista, TenistaError>> = flow {
@@ -170,35 +183,81 @@ class TenistasServiceImpl(
         logger.debug { "Importando tenistas desde fichero: ${file.name}" }
         // Debemos saber si la extensión es CSV o JSON si no error
         when (file.extension.lowercase()) {
-            "csv" -> importCsv(file)
-            "json" -> importJson(file)
-            else -> emit(Err(TenistaError.StorageError("Formato de fichero de importación no soportado")))
+            "csv" -> emit(importCsv(file))
+            "json" -> emit(importJson(file))
+            else -> emit(Err(TenistaError.StorageError("Formato de fichero de importación no soportado. Solo CSV o JSON")))
         }
     }.flowOn(Dispatchers.IO)
 
-    private fun importCsv(file: File) {
-        TODO("Not yet implemented")
+    private suspend fun importCsv(file: File): Result<Int, TenistaError> {
+        logger.debug { "Importando tenistas desde fichero CSV: ${file.name}" }
+        // Leemos el fichero CSV
+        return csvStorage.import(file).first().mapBoth(
+            success = { saveAll(it) },
+            failure = { Err(it) }
+        )
     }
 
-    private fun importJson(file: File) {
-        TODO("Not yet implemented")
+    private suspend fun importJson(file: File): Result<Int, TenistaError> {
+        logger.debug { "Importando tenistas desde fichero JSON: ${file.name}" }
+        // Leemos el fichero JSON
+        return jsonStorage.import(file).first().mapBoth(
+            success = { saveAll(it) },
+            failure = { Err(it) }
+        )
     }
 
-    override fun export(file: File): Flow<Result<Int, TenistaError>> {
+    private suspend fun saveAll(tenistas: List<Tenista>): Result<Int, TenistaError> {
+        logger.debug { "Guardando todos los tenistas: ${tenistas.size}" }
+        // Recorro los tenistas y los guardo en remoto y local
+        var contador = 0
+        localRepository.removeAll().first()
+        tenistas.forEach {
+            remoteRepository.save(it).first().andThen { t -> localRepository.save(t).first() }.mapBoth(
+                success = { contador++ },
+                failure = { e -> return Err(e) }
+            )
+        }
+        return Ok(contador)
+    }
+
+    override fun export(file: File, fromRemote: Boolean): Flow<Result<Int, TenistaError>> = flow {
         logger.debug { "Exportando tenistas a fichero: ${file.name}" }
         // Debemos saber si la extensión es CSV o JSON si no error
-        return when (file.extension.lowercase()) {
-            "csv" -> exportCsv(file)
-            "json" -> exportJson(file)
-            else -> flow { emit(Err(TenistaError.StorageError("Formato de fichero de exportación no soportado"))) }
-        }.flowOn(Dispatchers.IO)
+        when (file.extension.lowercase()) {
+            "csv" -> emit(exportCsv(file, fromRemote))
+            "json" -> emit(exportJson(file, fromRemote))
+            else -> emit(Err(TenistaError.StorageError("Formato de fichero de exportación no soportado. Solo CSV o JSON")))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    private suspend fun exportCsv(file: File, fromRemote: Boolean = false): Result<Int, TenistaError> {
+        logger.debug { "Exportando tenistas a fichero CSV: ${file.name}" }
+        // Obtenemos los tenistas (podemos elegir sin remoto o local
+        return if (fromRemote) {
+            remoteRepository.getAll().first().andThen { tenistas ->
+                csvStorage.export(file, tenistas).first()
+            }
+        } else {
+            localRepository.getAll().first().andThen { tenistas ->
+                csvStorage.export(file, tenistas).first()
+            }
+        }
     }
 
-    private fun exportCsv(file: File): Flow<Result<Int, TenistaError>> {
-        TODO("Not yet implemented")
+    private suspend fun exportJson(file: File, remote: Boolean = false): Result<Int, TenistaError> {
+        logger.debug { "Exportando tenistas a fichero JSON: ${file.name}" }
+        // Obtenemos los tenistas
+        return if (remote) {
+            remoteRepository.getAll().first().andThen { tenistas ->
+                jsonStorage.export(file, tenistas).first()
+            }
+        } else {
+            localRepository.getAll().first().andThen { tenistas ->
+                jsonStorage.export(file, tenistas).first()
+            }
+        }
     }
 
-    private fun exportJson(file: File): Flow<Result<Int, TenistaError>> {
-        TODO("Not yet implemented")
-    }
+
 }

@@ -48,7 +48,7 @@ class TenistasRepositoryLocal(
         // Hacemos una transacción para poder obtener el id del tenista guardado
         sqlClient.queries.transaction {
             sqlClient.queries.insert(
-                t.copy(createdAt = timeSpam, updatedAt = timeSpam).toTenistaEntity()
+                t.copy(createdAt = timeSpam, updatedAt = timeSpam, id = Tenista.NEW_ID).toTenistaEntity()
             )
         }
         // Consultamos el tenista guardado (segun la implementación de SQLDelight usamos transactions)

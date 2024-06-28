@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.lighthousegames.logging.logging
 import java.time.LocalDate
+import kotlin.io.path.Path
 
 private val logger = logging()
 
@@ -39,6 +40,7 @@ fun main(): Unit = runBlocking {
 
     // Iniciamos la escucha de notificaciones de tenistas en una corrutina para que se ejecute en segundo plano
     val notificationJob = launch {
+        println("🔊 Escuchando notificaciones de tenistas 🔊")
         tenistasService.notifications.distinctUntilChanged()
             //.onEach {
             //    logger.debug { "Notificación recibida: ${it.type} ${it.item}" }
@@ -57,7 +59,7 @@ fun main(): Unit = runBlocking {
     delay(2000)
 
     // Obtenemos todos los tenistas
-    var tenistas = tenistasService.getAll().first().mapBoth(
+    var tenistas = tenistasService.getAll(false).first().mapBoth(
         success = {
             println("Tenistas obtenidos: ${it.size}")
             println(it)
@@ -103,7 +105,7 @@ fun main(): Unit = runBlocking {
     )
 
     // Obtenemos todos los tenistas
-    tenistas = tenistasService.getAll().first().mapBoth(
+    tenistas = tenistasService.getAll(false).first().mapBoth(
         success = {
             println("Tenistas obtenidos: ${it.size}")
             println(it)
@@ -128,7 +130,7 @@ fun main(): Unit = runBlocking {
     )
 
     // Obtenemos todos los tenistas
-    tenistas = tenistasService.getAll().first().mapBoth(
+    tenistas = tenistasService.getAll(false).first().mapBoth(
         success = {
             println("Tenistas obtenidos: ${it.size}")
             println(it)
@@ -153,7 +155,7 @@ fun main(): Unit = runBlocking {
     )
 
     // Obtenemos todos los tenistas
-    tenistas = tenistasService.getAll().first().mapBoth(
+    tenistas = tenistasService.getAll(false).first().mapBoth(
         success = {
             println("Tenistas obtenidos: ${it.size}")
             println(it)
@@ -171,10 +173,105 @@ fun main(): Unit = runBlocking {
         failure = { println(it.message) }
     )
 
-
     // Esperamos 3 segundos
-    delay(3000)
-    notificationJob.cancel() // Cancelamos la escucha de notificaciones
+    //delay(3000)
+    println("🔇 Desactivamos la escucha de notificaciones de tenistas 🔇")
+    notificationJob.cancel() // Cancelamos la escucha de notificaciones, porque ya no nos interesa
+
+    // Pruebas de ficheros CSV Import
+    val csvImport = Path("data", "tenistas2.csv").toFile()
+    tenistasService.import(csvImport).first().mapBoth(
+        success = { println("Tenistas importados desde cvs: $it") },
+        failure = { println(it.message) }
+    )
+
+    // Pruebas de ficheros JSON Import
+    val jsonImport = Path("data", "tenistas3.json").toFile()
+    tenistasService.import(jsonImport).first().mapBoth(
+        success = { println("Tenistas importados desde json: $it") },
+        failure = { println(it.message) }
+    )
+
+
+    // Pruebas de ficheros CSV Export
+    val csvExport = Path("data", "tenistas_export.csv").toFile()
+    tenistasService.export(csvExport, fromRemote = true).first().mapBoth(
+        success = { println("Tenistas exportados a cvs: $it") },
+        failure = { println(it.message) }
+    )
+
+    // Pruebas de ficheros JSON Export
+    val jsonExport = Path("data", "tenistas_export.json").toFile()
+    tenistasService.export(jsonExport, fromRemote = true).first().mapBoth(
+        success = { println("Tenistas exportados a json: $it") },
+        failure = { println(it.message) }
+    )
+
+    // Consultamos todos los tenistas para hacerles las consultas
+    tenistas = tenistasService.getAll(true).first().mapBoth(
+        success = {
+            println("Tenistas obtenidos: ${it.size}")
+            println(it)
+            it
+        },
+        failure = {
+            println(it.message)
+            emptyList()
+        }
+    )
+
+    // tenistas ordenados con ranking, es decir, por puntos de mayor a menor
+    println("Tenistas ordenados por ranking")
+    tenistas.sortedByDescending { it.puntos }.forEachIndexed { index, tenista ->
+        println("Ranking ${index + 1}: ${tenista.nombre} -> ${tenista.puntos}")
+    }
+
+    // Media de altura de los tenistas
+    val mediaAltura = tenistas.map { it.altura }.average()
+    println("Media de altura de los tenistas: $mediaAltura")
+
+    // Media de peso de los tenistas
+    val mediaPeso = tenistas.map { it.peso }.average()
+    println("Media de peso de los tenistas: $mediaPeso")
+
+    // Tenista más alto
+    val tenistaMasAlto = tenistas.maxByOrNull { it.altura }
+    println("Tenista más alto: $tenistaMasAlto")
+
+    // Tenista más bajo
+    val tenistaMasBajo = tenistas.minByOrNull { it.altura }
+    println("Tenista más bajo: $tenistaMasBajo")
+
+    // Tenistas españoles
+    val tenistasEspanoles = tenistas.filter { it.pais == "España" }
+    println("Tenistas españoles: ${tenistasEspanoles.size}")
+
+    // Tenistas agrupados por pais
+    val tenistasPorPais = tenistas.groupBy { it.pais }
+    tenistasPorPais.forEach { (pais, tenistas) ->
+        println("Tenistas de $pais: ${tenistas.size}")
+    }
+
+    // Número de tenistas agrupados por pais y ordenados por puntos descendente
+    val tenistasPorPaisOrdenados = tenistas.groupBy { it.pais }
+        .mapValues { it.value.sortedByDescending { tenista -> tenista.puntos } }
+    tenistasPorPaisOrdenados.forEach { (pais, tenistas) ->
+        println("Tenistas de $pais: ${tenistas.size}")
+        tenistas.forEach { println(it) }
+    }
+
+    // Puntuación total de los tenistas agrupados por pais
+    val puntuacionTotalPorPais = tenistas.groupBy { it.pais }
+        .mapValues { it.value.sumOf { tenista -> tenista.puntos } }
+    puntuacionTotalPorPais.forEach { (pais, puntos) ->
+        println("Puntuación total de los tenistas de $pais: $puntos")
+    }
+
+    // pais con puntuación total más alta (cogemos el resultado anterior)
+    val paisMasPuntuacion = puntuacionTotalPorPais.maxByOrNull { it.value }
+    println("País con más puntuación total: ${paisMasPuntuacion?.key} -> ${paisMasPuntuacion?.value}")
+
+
     println("👋👋 Adios Tenistas 👋👋")
 
 }
