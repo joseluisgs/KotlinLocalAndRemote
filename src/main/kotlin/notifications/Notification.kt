@@ -5,7 +5,8 @@ import java.time.LocalDateTime
 data class Notification<T>(
     val type: Type,
     val item: T? = null,
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    val message: String? = null,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 ) {
     enum class Type {
         CREATE, UPDATE, DELETE, REFRESH

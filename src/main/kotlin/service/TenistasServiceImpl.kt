@@ -59,7 +59,12 @@ class TenistasServiceImpl(
                 logger.error { "Error al refrescar los datos: ${it.message}" }
             }.also {
                 // Enviamos la notificación de refresco
-                notificationsService.send(Notification(Notification.Type.REFRESH))
+                notificationsService.send(
+                    Notification(
+                        type = Notification.Type.REFRESH,
+                        message = "Nuevos datos disponibles: ${it.value}"
+                    )
+                )
                 // borramos la cache
                 cache.clear()
             }
@@ -116,7 +121,13 @@ class TenistasServiceImpl(
             success = {
                 // Enviamos la notificación de creación
                 cache.put(it.id, it)
-                notificationsService.send(Notification(Notification.Type.CREATE, it))
+                notificationsService.send(
+                    Notification(
+                        type = Notification.Type.CREATE,
+                        item = it,
+                        message = "Nuevo tenista creado con id: ${it.id}"
+                    )
+                )
                 emit(Ok(it))
             },
             failure = { emit(Err(it)) }
@@ -136,7 +147,13 @@ class TenistasServiceImpl(
             success = {
                 // Enviamos la notificación de actualización
                 cache.put(it.id, it)
-                notificationsService.send(Notification(Notification.Type.UPDATE, it))
+                notificationsService.send(
+                    Notification(
+                        type = Notification.Type.UPDATE,
+                        item = it,
+                        message = "Tenista actualizado con id: ${it.id}"
+                    )
+                )
                 emit(Ok(it))
             },
             failure = { emit(Err(it)) }
@@ -152,7 +169,12 @@ class TenistasServiceImpl(
         }.mapBoth(
             success = {
                 // Enviamos la notificación de borrado
-                notificationsService.send(Notification(Notification.Type.DELETE))
+                notificationsService.send(
+                    Notification(
+                        type = Notification.Type.DELETE,
+                        message = "Tenista borrado con id: $id"
+                    )
+                )
                 emit(Ok(Unit))
             },
             failure = { emit(Err(it)) }

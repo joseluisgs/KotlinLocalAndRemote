@@ -45,10 +45,10 @@ fun main(): Unit = runBlocking {
             //}
             .collect {
                 when (it.type) {
-                    Notification.Type.CREATE -> println("🟢 Notificación de creación de tenista: ${it.item}")
-                    Notification.Type.UPDATE -> println("🟠 Notificación de actualización de tenista: ${it.item}")
-                    Notification.Type.DELETE -> println("🔴 Notificación de borrado de tenista: ${it.item}")
-                    Notification.Type.REFRESH -> println("🔵 Notificación de refresco de tenistas")
+                    Notification.Type.CREATE -> println("🟢 Notificación de creación de tenista: ${it.message} -> ${it.item}")
+                    Notification.Type.UPDATE -> println("🟠 Notificación de actualización de tenista: ${it.message} -> ${it.item}")
+                    Notification.Type.DELETE -> println("🔴 Notificación de borrado de tenista: ${it.message}")
+                    Notification.Type.REFRESH -> println("🔵 Notificación de refresco de tenistas: ${it.message}")
                 }
 
             }
