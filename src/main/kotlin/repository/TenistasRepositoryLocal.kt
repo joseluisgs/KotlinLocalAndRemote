@@ -32,7 +32,7 @@ class TenistasRepositoryLocal(
 
     override fun getAll(): Flow<Result<List<Tenista>, TenistaError>> = flow {
         logger.debug { "Obteniendo todos los tenistas ordenados por puntos de la bd" }
-        emit(Ok(sqlClient.queries.selectAllOrderByPuntosDesc().executeAsList().map { it.toTenista() }))
+        emit(Ok(sqlClient.queries.selectAll().executeAsList().map { it.toTenista() }))
     }.flowOn(Dispatchers.IO)
 
     override fun getById(id: Long): Flow<Result<Tenista, TenistaError>> = flow {

@@ -39,7 +39,7 @@ class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : Tenist
 
     override fun save(t: Tenista): Flow<Result<Tenista, TenistaError.RemoteError>> = flow {
         logger.debug { "Guardando tenista en la api rest" }
-        restClient.save(t.toTenistaDto()).mapBoth(
+        restClient.save(t.copy(id = Tenista.NEW_ID).toTenistaDto()).mapBoth(
             success = { emit(Ok(it.toTenista())) },
             failure = { emit(Err(TenistaError.RemoteError("${it.message}, no se ha podido guardar el tenista $t"))) }
         )

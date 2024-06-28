@@ -4,6 +4,7 @@ import com.github.michaelbull.result.mapBoth
 import database.SqlDeLightManager
 import database.createDatabase
 import dev.joseluisgs.cache.TenistasCache
+import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.notifications.Notification
 import dev.joseluisgs.notifications.TenistasNotifications
 import dev.joseluisgs.repository.TenistasRepositoryLocal
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.lighthousegames.logging.logging
+import java.time.LocalDate
 
 private val logger = logging()
 
@@ -55,7 +57,7 @@ fun main(): Unit = runBlocking {
     delay(2000)
 
     // Obtenemos todos los tenistas
-    val tenistas = tenistasService.getAll().first().mapBoth(
+    var tenistas = tenistasService.getAll().first().mapBoth(
         success = {
             println("Tenistas obtenidos: ${it.size}")
             println(it)
@@ -82,6 +84,90 @@ fun main(): Unit = runBlocking {
     // Obtenemos un tenista por id que no existe
     tenistasService.getById(-1).first().mapBoth(
         success = { println("Tenista obtenido: $it") },
+        failure = { println(it.message) }
+    )
+
+    // Guardamos un tenista
+    val newTenista = tenistas.first().copy(
+        id = Tenista.NEW_ID,
+        nombre = "Test New",
+        fechaNacimiento = LocalDate.parse("1986-06-03"),
+        puntos = 10
+    )
+    tenistasService.save(newTenista).first().mapBoth(
+        success = {
+            println("Tenista guardado: $it")
+            it
+        },
+        failure = { println(it.message) }
+    )
+
+    // Obtenemos todos los tenistas
+    tenistas = tenistasService.getAll().first().mapBoth(
+        success = {
+            println("Tenistas obtenidos: ${it.size}")
+            println(it)
+            it
+        },
+        failure = {
+            println(it.message)
+            emptyList()
+        }
+    )
+
+
+    // Actualizamos un tenista
+    val updatedTenista = tenistas.first().copy(
+        nombre = "Test Update",
+        fechaNacimiento = LocalDate.parse("1986-06-03"),
+        puntos = 20
+    )
+    tenistasService.update(updatedTenista.id, updatedTenista).first().mapBoth(
+        success = { println("Tenista actualizado: $it") },
+        failure = { println(it.message) }
+    )
+
+    // Obtenemos todos los tenistas
+    tenistas = tenistasService.getAll().first().mapBoth(
+        success = {
+            println("Tenistas obtenidos: ${it.size}")
+            println(it)
+            it
+        },
+        failure = {
+            println(it.message)
+            emptyList()
+        }
+    )
+
+    // Actualizamos un tenista que no existe
+    tenistasService.update(-1, updatedTenista).first().mapBoth(
+        success = { println("Tenista actualizado: $it") },
+        failure = { println(it.message) }
+    )
+
+    // Borramos un tenista
+    tenistasService.delete(updatedTenista.id).first().mapBoth(
+        success = { println("Tenista borrado") },
+        failure = { println(it.message) }
+    )
+
+    // Obtenemos todos los tenistas
+    tenistas = tenistasService.getAll().first().mapBoth(
+        success = {
+            println("Tenistas obtenidos: ${it.size}")
+            println(it)
+            it
+        },
+        failure = {
+            println(it.message)
+            emptyList()
+        }
+    )
+
+    // Borramos un tenista que no existe
+    tenistasService.delete(-1).first().mapBoth(
+        success = { println("Tenista borrado") },
         failure = { println(it.message) }
     )
 

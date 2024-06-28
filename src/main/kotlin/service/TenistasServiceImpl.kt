@@ -10,6 +10,7 @@ import dev.joseluisgs.repository.TenistasRepositoryLocal
 import dev.joseluisgs.repository.TenistasRepositoryRemote
 import dev.joseluisgs.storage.TenistasStorageCsv
 import dev.joseluisgs.storage.TenistasStorageJson
+import dev.joseluisgs.validator.validate
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.lighthousegames.logging.logging
@@ -18,7 +19,7 @@ import kotlin.coroutines.CoroutineContext
 
 
 private val logger = logging()
-private const val REFRESH_TIME = 2000L // 5 segundos
+private const val REFRESH_TIME = 5000L // 5 segundos
 
 class TenistasServiceImpl(
     private val localRepository: TenistasRepositoryLocal,
@@ -102,17 +103,62 @@ class TenistasServiceImpl(
         }
     }.flowOn(Dispatchers.IO)
 
-    override fun save(tenista: Tenista): Flow<Result<Tenista, TenistaError>> {
-        TODO("Not yet implemented")
-    }
+    override fun save(tenista: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
+        logger.debug { "Guardando tenista: $tenista" }
+        // validamos
+        tenista.validate().andThen {
+            // Guardamos en remoto
+            remoteRepository.save(tenista).first()
+        }.andThen {
+            // Guardamos en local
+            localRepository.save(it).first()
+        }.mapBoth(
+            success = {
+                // Enviamos la notificación de creación
+                cache.put(it.id, it)
+                notificationsService.send(Notification(Notification.Type.CREATE, it))
+                emit(Ok(it))
+            },
+            failure = { emit(Err(it)) }
+        )
+    }.flowOn(Dispatchers.IO)
 
-    override fun update(id: Long, tenista: Tenista): Flow<Result<Tenista, TenistaError>> {
-        TODO("Not yet implemented")
-    }
+    override fun update(id: Long, tenista: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
+        logger.debug { "Actualizando tenista por id: $id" }
+        // validamos
+        tenista.validate().andThen {
+            // Actualizamos en remoto
+            remoteRepository.update(id, tenista).first()
+        }.andThen {
+            // Actualizamos en local
+            localRepository.update(id, it).first()
+        }.mapBoth(
+            success = {
+                // Enviamos la notificación de actualización
+                cache.put(it.id, it)
+                notificationsService.send(Notification(Notification.Type.UPDATE, it))
+                emit(Ok(it))
+            },
+            failure = { emit(Err(it)) }
+        )
+    }.flowOn(Dispatchers.IO)
 
-    override fun delete(id: Long): Flow<Result<Unit, TenistaError>> {
-        TODO("Not yet implemented")
-    }
+    override fun delete(id: Long): Flow<Result<Unit, TenistaError>> = flow {
+        logger.debug { "Borrando tenista por id: $id" }
+        // Borramos en remoto
+        remoteRepository.delete(id).first().andThen {
+            // Borramos en local
+            localRepository.delete(id).first()
+        }.mapBoth(
+            success = {
+                // Enviamos la notificación de borrado
+                notificationsService.send(Notification(Notification.Type.DELETE))
+                emit(Ok(Unit))
+            },
+            failure = { emit(Err(it)) }
+        )
+    }.flowOn(Dispatchers.IO)
+
 
     override fun import(file: File): Flow<Result<Int, TenistaError>> {
         TODO("Not yet implemented")
