@@ -18,6 +18,7 @@ import org.lighthousegames.logging.logging
 private val logger = logging()
 
 class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : TenistasRepository {
+
     override fun getAll(): Flow<Result<List<Tenista>, TenistaError.RemoteError>> = flow {
         logger.debug { "Obteniendo todos los tenistas de la api rest" }
         restClient.getAll().mapBoth(

@@ -2,7 +2,7 @@ package storage
 
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.models.Tenista
-import dev.joseluisgs.storage.TenistasSerializationCsv
+import dev.joseluisgs.storage.TenistasStorageCsv
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -14,9 +14,9 @@ import java.nio.file.Path
 import java.time.LocalDate
 import kotlin.test.Test
 
-class TenistasSerializationCsvTest {
+class TenistasStorageCsvTest {
     // importamos la clase a testear
-    private val tenistasSerializationCsv = TenistasSerializationCsv()
+    private val tenistasStorageCsv = TenistasStorageCsv()
 
     @TempDir // Inyectamos un directorio temporal
     lateinit var tempDir: Path
@@ -25,7 +25,7 @@ class TenistasSerializationCsvTest {
     fun `import debe devolver error si el fichero no existe`(): Unit = runTest {
         val nonExistentFile = File(tempDir.toFile(), "fichero_no_existe.csv")
 
-        val result = tenistasSerializationCsv.import(nonExistentFile).first()
+        val result = tenistasStorageCsv.import(nonExistentFile).first()
         assertAll(
             { assertTrue(result.isErr) },
             { assertTrue(result.error is TenistaError.StorageError) },
@@ -45,7 +45,7 @@ class TenistasSerializationCsvTest {
             )
         }
 
-        val result = tenistasSerializationCsv.import(validFile).first()
+        val result = tenistasStorageCsv.import(validFile).first()
 
         assertAll(
             { assertTrue(result.isOk) },
@@ -81,7 +81,7 @@ class TenistasSerializationCsvTest {
             )
         )
 
-        val result = tenistasSerializationCsv.export(file, tenistas).first()
+        val result = tenistasStorageCsv.export(file, tenistas).first()
 
         assertAll(
             { assertTrue(result.isOk) },
@@ -112,7 +112,7 @@ class TenistasSerializationCsvTest {
             )
         )
 
-        val result = tenistasSerializationCsv.export(invalidFile, tenistas).first()
+        val result = tenistasStorageCsv.export(invalidFile, tenistas).first()
 
         assertAll(
             { assertTrue(result.isErr) },

@@ -22,7 +22,7 @@ class TenistasNotifications : Notifications<Tenista> {
         _notifications.asSharedFlow() // SharedFlow es un canal de solo lectura
 
 
-    override suspend fun sendNotification(notification: Notification<Tenista>): Unit = withContext(Dispatchers.IO) {
+    override suspend fun send(notification: Notification<Tenista>): Unit = withContext(Dispatchers.IO) {
         logger.debug { "Enviando notificación: $notification" }
         _notifications.tryEmit(notification)
     }

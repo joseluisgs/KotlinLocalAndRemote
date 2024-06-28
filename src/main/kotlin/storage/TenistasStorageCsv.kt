@@ -17,7 +17,7 @@ private val logger = logging()
 /**
  * Implementación de la serialización de Tenista en CSV asíncrono en base a Flow
  */
-class TenistasSerializationCsv : TenistasSerializationStorage {
+class TenistasStorageCsv : TenistasStorage {
     override fun import(file: File): Flow<Result<List<Tenista>, TenistaError.StorageError>> = flow {
         logger.debug { "Importando Tenistas desde CSV asíncrono: $file" }
 

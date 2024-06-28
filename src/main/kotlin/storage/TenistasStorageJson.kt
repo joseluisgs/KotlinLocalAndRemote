@@ -17,7 +17,7 @@ import java.io.File
 
 private val logger = logging()
 
-class TenistasSerializationJson : TenistasSerializationStorage {
+class TenistasStorageJson : TenistasStorage {
     override fun import(file: File): Flow<Result<List<Tenista>, TenistaError.StorageError>> = flow {
         logger.debug { "Importando Tenistas desde JSON asíncrono: $file" }
         // Si el fichero no existe, devolvemos un error

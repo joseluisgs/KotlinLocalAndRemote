@@ -34,7 +34,7 @@ class TenistasNotificationsTest {
         val tenistasNotifications = TenistasNotifications()
 
         // Act
-        tenistasNotifications.sendNotification(notification)
+        tenistasNotifications.send(notification)
 
         // Assert
         val emittedNotification = tenistasNotifications.notifications.distinctUntilChanged().first()

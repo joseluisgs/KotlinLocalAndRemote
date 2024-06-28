@@ -4,10 +4,10 @@ import java.time.LocalDateTime
 
 data class Notification<T>(
     val type: Type,
-    val item: T,
+    val item: T? = null,
     val createdAt: LocalDateTime = LocalDateTime.now()
 ) {
     enum class Type {
-        CREATE, UPDATE, DELETE, ERROR, REFRESH
+        CREATE, UPDATE, DELETE, REFRESH
     }
 }

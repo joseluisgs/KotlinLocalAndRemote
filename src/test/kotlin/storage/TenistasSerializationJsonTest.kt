@@ -2,7 +2,7 @@ package storage
 
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.models.Tenista
-import dev.joseluisgs.storage.TenistasSerializationJson
+import dev.joseluisgs.storage.TenistasStorageJson
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -16,7 +16,7 @@ import kotlin.test.Test
 
 class TenistasSerializationJsonTest {
     // importamos la clase a testear
-    private val tenistasSerializationJson = TenistasSerializationJson()
+    private val tenistasSerializationJson = TenistasStorageJson()
 
     @TempDir // Inyectamos un directorio temporal
     lateinit var tempDir: Path

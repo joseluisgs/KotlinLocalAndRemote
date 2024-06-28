@@ -29,6 +29,7 @@ class TenistasRepositoryLocal(
         sqlClient.queries.removeAll()
     }
 
+
     override fun getAll(): Flow<Result<List<Tenista>, TenistaError>> = flow {
         logger.debug { "Obteniendo todos los tenistas ordenados por puntos de la bd" }
         emit(Ok(sqlClient.queries.selectAllOrderByPuntosDesc().executeAsList().map { it.toTenista() }))
@@ -46,7 +47,9 @@ class TenistasRepositoryLocal(
         val timeSpam = LocalDateTime.now()
         // Hacemos una transacción para poder obtener el id del tenista guardado
         sqlClient.queries.transaction {
-            sqlClient.queries.insert(t.copy(createdAt = timeSpam, updatedAt = timeSpam).toTenistaEntity())
+            sqlClient.queries.insert(
+                t.copy(createdAt = timeSpam, updatedAt = timeSpam).toTenistaEntity()
+            )
         }
         // Consultamos el tenista guardado (segun la implementación de SQLDelight usamos transactions)
         val new = sqlClient.queries.selectLastInserted().executeAsOne().toTenista()
@@ -86,4 +89,20 @@ class TenistasRepositoryLocal(
             failure = { error -> Err(error) }
         ))
     }.flowOn(Dispatchers.IO)
+
+    fun removeAll(): Flow<Result<Unit, TenistaError>> = flow {
+        logger.debug { "Borrando todos los tenistas de la bd" }
+        sqlClient.queries.removeAll()
+        emit(Ok(Unit))
+    }
+
+    fun saveAll(tenistas: List<Tenista>): Flow<Result<Int, TenistaError>> = flow {
+        logger.debug { "Guardando todos los tenistas en la bd local: ${tenistas.size}" }
+        sqlClient.queries.transaction {
+            tenistas.forEach {
+                sqlClient.queries.insert(it.toTenistaEntity())
+            }
+        }
+        emit(Ok(tenistas.size))
+    }
 }
