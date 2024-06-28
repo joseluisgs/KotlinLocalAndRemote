@@ -189,4 +189,5 @@ queremos
 que se mantenga el último valor emitido podemos usar un SharedFlow con replay de 1 y que se borre el buffer los valores
 antiguos.
 
-Enlace a los [commit de la sección]().
+Enlace a
+los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/a742db9eeec1e5dea2d2c8871efde528510f3af7).
