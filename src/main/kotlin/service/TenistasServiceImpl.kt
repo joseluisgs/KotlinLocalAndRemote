@@ -81,20 +81,24 @@ class TenistasServiceImpl(
             emit(Ok(it))
         } ?: run {
             // Buscamos en el repositorio local, y si esta lo metemos en la cache y lo devolvemos
-            localRepository.getById(id).first().onSuccess {
-                cache.put(it.id, it)
-                emit(Ok(it))
-            }.onFailure {
-                // Si no está en local, lo buscamos en remoto, lo guardamos en local y lo metemos en la cache
-                remoteRepository.getById(id).first().andThen {
-                    localRepository.save(it).first().onSuccess { t ->
-                        cache.put(t.id, t)
-                        emit(Ok(t))
-                    }.onFailure { error ->
-                        emit(Err(error))
-                    }
+            localRepository.getById(id).first().mapBoth(
+                success = {
+                    cache.put(it.id, it)
+                    emit(Ok(it))
+                },
+                failure = {
+                    // Si no está en local, lo buscamos en remoto, lo guardamos en local y lo metemos en la cache
+                    remoteRepository.getById(id).first().andThen {
+                        localRepository.save(it).first()
+                    }.mapBoth(
+                        success = {
+                            cache.put(it.id, it)
+                            emit(Ok(it))
+                        },
+                        failure = { emit(Err(it)) }
+                    )
                 }
-            }
+            )
         }
     }.flowOn(Dispatchers.IO)
 

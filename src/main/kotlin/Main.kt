@@ -1,5 +1,6 @@
 package dev.joseluisgs
 
+import com.github.michaelbull.result.mapBoth
 import database.SqlDeLightManager
 import database.createDatabase
 import dev.joseluisgs.cache.TenistasCache
@@ -54,8 +55,35 @@ fun main(): Unit = runBlocking {
     delay(2000)
 
     // Obtenemos todos los tenistas
-    val tenistas = tenistasService.getAll().first()
-    println("Tenistas: $tenistas")
+    val tenistas = tenistasService.getAll().first().mapBoth(
+        success = {
+            println("Tenistas obtenidos: ${it.size}")
+            println(it)
+            it
+        },
+        failure = {
+            println(it.message)
+            emptyList()
+        }
+    )
+
+    // Obtenemos un tenista por id que existes
+    tenistasService.getById(1).first().mapBoth(
+        success = { println("Tenista obtenido: $it") },
+        failure = { println(it.message) }
+    )
+
+    // Volvemos a obtener el mismo tenista ahora debe estar en la cache
+    tenistasService.getById(1).first().mapBoth(
+        success = { println("Tenista obtenido: $it") },
+        failure = { println(it.message) }
+    )
+
+    // Obtenemos un tenista por id que no existe
+    tenistasService.getById(-1).first().mapBoth(
+        success = { println("Tenista obtenido: $it") },
+        failure = { println(it.message) }
+    )
 
 
     // Esperamos 3 segundos
