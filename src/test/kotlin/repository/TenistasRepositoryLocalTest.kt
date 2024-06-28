@@ -13,7 +13,7 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
@@ -60,7 +60,7 @@ class TenistasRepositoryLocalTest {
     )
 
     @Test
-    fun `getAll debe devolver todos los tenistas`() = runBlocking {
+    fun `getAll debe devolver todos los tenistas`() = runTest {
         coEvery {
             databaseQueries.selectAllOrderByPuntosDesc().executeAsList()
         } returns listOf(testTenista.toTenistaEntity())
@@ -75,7 +75,7 @@ class TenistasRepositoryLocalTest {
     }
 
     @Test
-    fun `getById debe devolver el tenista correspondiente`() = runBlocking {
+    fun `getById debe devolver el tenista correspondiente`() = runTest {
         val id = testTenista.id
         coEvery {
             databaseQueries.selectById(id).executeAsOneOrNull()
@@ -91,7 +91,7 @@ class TenistasRepositoryLocalTest {
     }
 
     @Test
-    fun `getById debe devolver error si el tenista no existe`() = runBlocking {
+    fun `getById debe devolver error si el tenista no existe`() = runTest {
         val id = 1L
         coEvery {
             databaseQueries.selectById(id).executeAsOneOrNull()
@@ -107,7 +107,7 @@ class TenistasRepositoryLocalTest {
     }
 
     @Test
-    fun `save debe guardar el tenista y devolverlo`() = runBlocking {
+    fun `save debe guardar el tenista y devolverlo`() = runTest {
 
         // Cuidado que estamos usando una transacción
         coEvery {
@@ -151,7 +151,7 @@ class TenistasRepositoryLocalTest {
     }
 
     @Test
-    fun `update debe actualizar el tenista y devolverlo`() = runBlocking {
+    fun `update debe actualizar el tenista y devolverlo`() = runTest {
         val id = testTenista.id
         val updatedTenista = testTenista.copy(nombre = "Updated Test")
 
@@ -189,7 +189,7 @@ class TenistasRepositoryLocalTest {
     }
 
     @Test
-    fun `update debe devolver error si el tenista no existe`() = runBlocking {
+    fun `update debe devolver error si el tenista no existe`() = runTest {
         val id = 1L
         val updatedTenista = testTenista.copy(nombre = "Updated Test Fails")
 
@@ -208,7 +208,7 @@ class TenistasRepositoryLocalTest {
     }
 
     @Test
-    fun `delete debe borrar lógicamente el tenista y devolverlo`() = runBlocking {
+    fun `delete debe borrar lógicamente el tenista y devolverlo`() = runTest {
         val id = testTenista.id
 
         coEvery {
@@ -229,7 +229,7 @@ class TenistasRepositoryLocalTest {
     }
 
     @Test
-    fun `delete debe devolver error si el tenista no existe`() = runBlocking {
+    fun `delete debe devolver error si el tenista no existe`() = runTest {
         val id = 1L
 
         coEvery {

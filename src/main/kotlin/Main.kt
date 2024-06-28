@@ -5,12 +5,15 @@ import com.github.michaelbull.result.onSuccess
 import database.SqlDeLightManager
 import database.createDatabase
 import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.notifications.Notification
+import dev.joseluisgs.notifications.TenistasNotifications
 import dev.joseluisgs.repository.TenistasRepositoryLocal
 import dev.joseluisgs.repository.TenistasRepositoryRemote
 import dev.joseluisgs.rest.API_TENISTAS_URL
 import dev.joseluisgs.rest.getKtorFitClient
 import dev.joseluisgs.storage.TenistasSerializationCsv
 import dev.joseluisgs.storage.TenistasSerializationJson
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlin.io.path.Path
@@ -225,6 +228,17 @@ fun main(): Unit = runBlocking {
         }.onFailure { error ->
             println(error.message)
         }
+
+
+    // Notificaciones
+    val tenistasNotifications = TenistasNotifications()
+
+
+    // Enviamos una notificación
+    tenistasNotifications.sendNotification(Notification(Notification.Type.CREATE, misTenistas.first()))
+    println("Notificación recibida: ${tenistasNotifications.notifications.distinctUntilChanged().first()}")
+
+
     println("Adios Tenistas!")
 
 }

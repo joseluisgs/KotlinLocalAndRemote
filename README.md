@@ -161,3 +161,32 @@ nuestra propia respuesta basada en Result y seguir con la filosofía de ROP.
 
 Enlace a
 los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/f519fb861d60298c88eb64e578206fcd3c31dacd).
+
+## Validador
+
+Para la realización del validador de datos, hemos usado una función de extensión de Kotlin que nos permite validar los
+datos de forma sencilla y eficiente.
+
+Enlace a
+los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/f38b4233d4378a29fa16d314ede3f8281c6d9378).
+
+## Notificaciones
+
+Para la realización del servicio de notificaciones, hemos hecho uso de dos clases de la familia de los Flows que nos
+pueden ayudar a ello:
+
+- [SharedFlow](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-shared-flow/):
+  Un Flow que permite compartir los datos entre varios consumidores, es decir, varios consumidores pueden
+  recibir los mismos datos.
+  De esta manera podemos definir un SharedFlow para las notificaciones y varios consumidores pueden recibir las
+  notificaciones indicando los cambios realizados.
+- [StateFlow](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-state-flow/):
+  Un Flow que permite emitir un valor y mantener el último valor emitido. De esta manera podemos definir un
+  StateFlow para las notificaciones y un consumidor puede recibir las notificaciones indicando los cambios realizados.
+
+La diferencia principal entre SharedFlow y StateFlow es que StateFlow debe tener un valor inicial y SharedFlow no. Si
+queremos
+que se mantenga el último valor emitido podemos usar un SharedFlow con replay de 1 y que se borre el buffer los valores
+antiguos.
+
+Enlace a los [commit de la sección]().
