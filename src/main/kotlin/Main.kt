@@ -121,7 +121,7 @@ fun main(): Unit = runBlocking {
 
     // Borramos un tenista
     tenistasRepositoryLocal.delete(misTenistas.first().id).first()
-        .onSuccess { tenista ->
+        .onSuccess {
             println("Tenista borrado con id ${misTenistas.first().id}")
         }.onFailure { error ->
             println(error.message)
@@ -129,7 +129,7 @@ fun main(): Unit = runBlocking {
 
     // Borramos un tenista que no existe
     tenistasRepositoryLocal.delete(-1).first()
-        .onSuccess { tenista ->
+        .onSuccess {
             println("Tenista borrado")
         }.onFailure { error ->
             println(error.message)
@@ -204,7 +204,7 @@ fun main(): Unit = runBlocking {
 
     // Borramos un tenista
     tenistasRepositoryRemote.delete((misTenistas.first().id)).first()
-        .onSuccess { tenista ->
+        .onSuccess {
             println("Tenista borrado con id ${misTenistas.first().id}")
         }.onFailure { error ->
             println(error.message)
@@ -212,7 +212,7 @@ fun main(): Unit = runBlocking {
 
     // Borramos un tenista que no existe
     tenistasRepositoryRemote.delete(-1).first()
-        .onSuccess { tenista ->
+        .onSuccess {
             println("Tenista borrado con id -1")
         }.onFailure { error ->
             println(error.message)

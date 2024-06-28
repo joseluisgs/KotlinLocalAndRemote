@@ -18,7 +18,7 @@ import java.io.File
 private val logger = logging()
 
 class TenistasSerializationJson : TenistasSerializationStorage {
-    override fun import(file: File): Flow<Result<List<Tenista>, TenistaError>> = flow {
+    override fun import(file: File): Flow<Result<List<Tenista>, TenistaError.StorageError>> = flow {
         logger.debug { "Importando Tenistas desde JSON asíncrono: $file" }
         // Si el fichero no existe, devolvemos un error
         if (!file.exists()) {
@@ -29,7 +29,7 @@ class TenistasSerializationJson : TenistasSerializationStorage {
         }
     }.flowOn(Dispatchers.IO) // Cambiamos el contexto de ejecución a IO
 
-    private fun readLines(file: File): Result<List<Tenista>, TenistaError> = try {
+    private fun readLines(file: File): Result<List<Tenista>, TenistaError.StorageError> = try {
         // Creamos el serializador de JSON
         val json = Json { ignoreUnknownKeys = true; encodeDefaults = false; isLenient = true }
         // Leemos el fichero y lo convertimos a Tenista
@@ -41,7 +41,7 @@ class TenistasSerializationJson : TenistasSerializationStorage {
     }
 
 
-    override fun export(file: File, data: List<Tenista>): Flow<Result<Int, TenistaError>> = flow {
+    override fun export(file: File, data: List<Tenista>): Flow<Result<Int, TenistaError.StorageError>> = flow {
         logger.debug { "Exportando Tenistas a JSON asíncrono: $file" }
         // Comprobamos que el fichero puede ser creado
         ensureFileCanExists(file)

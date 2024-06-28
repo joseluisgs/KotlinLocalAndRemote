@@ -18,7 +18,7 @@ private val logger = logging()
  * Implementación de la serialización de Tenista en CSV asíncrono en base a Flow
  */
 class TenistasSerializationCsv : TenistasSerializationStorage {
-    override fun import(file: File): Flow<Result<List<Tenista>, TenistaError>> = flow {
+    override fun import(file: File): Flow<Result<List<Tenista>, TenistaError.StorageError>> = flow {
         logger.debug { "Importando Tenistas desde CSV asíncrono: $file" }
 
         // Código de lectura del fichero
@@ -30,7 +30,7 @@ class TenistasSerializationCsv : TenistasSerializationStorage {
     }.flowOn(Dispatchers.IO) // Cambiamos el contexto de ejecución
 
 
-    override fun export(file: File, data: List<Tenista>): Flow<Result<Int, TenistaError>> = flow {
+    override fun export(file: File, data: List<Tenista>): Flow<Result<Int, TenistaError.StorageError>> = flow {
         logger.debug { "Exportando Tenistas a CSV asíncrono: $file" }
 
         ensureFileCanExists(file)
@@ -52,7 +52,7 @@ class TenistasSerializationCsv : TenistasSerializationStorage {
     }.flowOn(Dispatchers.IO) // Cambiamos el contexto de ejecución a IO
 
 
-    private fun readLines(file: File): Result<List<Tenista>, TenistaError> {
+    private fun readLines(file: File): Result<List<Tenista>, TenistaError.StorageError> {
         return try {
             // Código de lectura del fichero
             logger.debug { "Leyendo líneas del fichero: ${file.absolutePath}" }

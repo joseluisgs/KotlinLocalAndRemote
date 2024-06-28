@@ -8,10 +8,10 @@ import dev.joseluisgs.models.Tenista
 import java.io.File
 import java.io.IOException
 
-interface TenistasSerializationStorage : SerializationStorage<Tenista, TenistaError> {
+interface TenistasSerializationStorage : SerializationStorage<Tenista, TenistaError.StorageError> {
 
     // Implementación por defecto para un metodo de la interfaz
-    fun ensureFileCanExists(file: File): Result<File, TenistaError> {
+    fun ensureFileCanExists(file: File): Result<File, TenistaError.StorageError> {
         return try {
             if (file.exists() || file.createNewFile()) {
                 Ok(file)

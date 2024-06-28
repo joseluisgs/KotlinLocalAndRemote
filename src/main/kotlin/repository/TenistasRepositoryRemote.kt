@@ -18,7 +18,7 @@ import org.lighthousegames.logging.logging
 private val logger = logging()
 
 class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : TenistasRepository {
-    override fun getAll(): Flow<Result<List<Tenista>, TenistaError>> = flow {
+    override fun getAll(): Flow<Result<List<Tenista>, TenistaError.RemoteError>> = flow {
         logger.debug { "Obteniendo todos los tenistas de la api rest" }
         restClient.getAll().mapBoth(
             success = { emit(Ok(it.map { dto -> dto.toTenista() })) },
@@ -27,7 +27,7 @@ class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : Tenist
 
     }.flowOn(Dispatchers.IO)
 
-    override fun getById(id: Long): Flow<Result<Tenista, TenistaError>> = flow {
+    override fun getById(id: Long): Flow<Result<Tenista, TenistaError.RemoteError>> = flow {
         logger.debug { "Obteniendo tenista con id $id de la api rest" }
         restClient.getById(id).mapBoth(
             success = { emit(Ok(it.toTenista())) },
@@ -36,7 +36,7 @@ class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : Tenist
 
     }.flowOn(Dispatchers.IO)
 
-    override fun save(t: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
+    override fun save(t: Tenista): Flow<Result<Tenista, TenistaError.RemoteError>> = flow {
         logger.debug { "Guardando tenista en la api rest" }
         restClient.save(t.toTenistaDto()).mapBoth(
             success = { emit(Ok(it.toTenista())) },
@@ -44,7 +44,7 @@ class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : Tenist
         )
     }.flowOn(Dispatchers.IO)
 
-    override fun update(id: Long, t: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
+    override fun update(id: Long, t: Tenista): Flow<Result<Tenista, TenistaError.RemoteError>> = flow {
         logger.debug { "Actualizando tenista con id $id en la api rest" }
         restClient.update(id, t.toTenistaDto()).mapBoth(
             success = { emit(Ok(it.toTenista())) },
@@ -52,7 +52,7 @@ class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : Tenist
         )
     }.flowOn(Dispatchers.IO)
 
-    override fun delete(id: Long): Flow<Result<Unit, TenistaError>> = flow {
+    override fun delete(id: Long): Flow<Result<Unit, TenistaError.RemoteError>> = flow {
         logger.debug { "Borrando tenista con id $id en la api rest" }
         restClient.delete(id).mapBoth(
             success = { emit(Ok(Unit)) },
