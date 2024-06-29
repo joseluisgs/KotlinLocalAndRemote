@@ -35,7 +35,8 @@ fun main(): Unit = runBlocking {
         cache = TenistasCache(size = 5),
         csvStorage = TenistasStorageCsv(),
         jsonStorage = TenistasStorageJson(),
-        notificationsService = TenistasNotifications()
+        notificationsService = TenistasNotifications(),
+        autoRefresh = true // Activamos el refresco automático
     )
 
     // Iniciamos la escucha de notificaciones de tenistas en una corrutina para que se ejecute en segundo plano

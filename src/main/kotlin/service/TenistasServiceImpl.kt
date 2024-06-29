@@ -1,7 +1,7 @@
 package dev.joseluisgs.service
 
 import com.github.michaelbull.result.*
-import dev.joseluisgs.cache.TenistasCache
+import dev.joseluisgs.cache.Cache
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.notifications.Notification
@@ -24,10 +24,11 @@ private const val REFRESH_TIME = 15000L // 15 segundos
 class TenistasServiceImpl(
     private val localRepository: TenistasRepositoryLocal,
     private val remoteRepository: TenistasRepositoryRemote,
-    private val cache: TenistasCache,
+    private val cache: Cache<Long, Tenista>,
     private val csvStorage: TenistasStorageCsv,
     private val jsonStorage: TenistasStorageJson,
-    private val notificationsService: TenistasNotifications
+    private val notificationsService: TenistasNotifications,
+    private val autoRefresh: Boolean = false
 
 ) : TenistasService {
 
@@ -36,13 +37,17 @@ class TenistasServiceImpl(
 
 
     init {
-        val job = Job()
-        val coroutineContext: CoroutineContext = Dispatchers.IO + job
-        logger.debug { "Inicializando TenistasServiceImpl" }
+
         // Iniciamos le refresh de los datos
-        CoroutineScope(coroutineContext).launch {
-            refresh()
+        if (autoRefresh) {
+            val job = Job()
+            val coroutineContext: CoroutineContext = Dispatchers.IO + job
+            logger.debug { "Inicializando TenistasServiceImpl" }
+            CoroutineScope(coroutineContext).launch {
+                refresh()
+            }
         }
+
     }
 
 
