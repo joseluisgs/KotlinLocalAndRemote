@@ -7,11 +7,13 @@ import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.mapper.toTenistaEntity
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.repository.TenistasRepositoryLocal
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import io.mockk.just
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -62,7 +64,7 @@ class TenistasRepositoryLocalTest {
     @Test
     fun `getAll debe devolver todos los tenistas`() = runTest {
         coEvery {
-            databaseQueries.selectAllOrderByPuntosDesc().executeAsList()
+            databaseQueries.selectAll().executeAsList()
         } returns listOf(testTenista.toTenistaEntity())
 
         val result = repository.getAll().first()
@@ -71,7 +73,7 @@ class TenistasRepositoryLocalTest {
             { assertEquals(listOf(testTenista), result.value) }
         )
 
-        coVerify(atLeast = 1) { databaseQueries.selectAllOrderByPuntosDesc() }
+        coVerify(atLeast = 1) { databaseQueries.selectAll() }
     }
 
     @Test
@@ -244,6 +246,59 @@ class TenistasRepositoryLocalTest {
 
         coVerify(atLeast = 1) { databaseQueries.selectById(id) }
         coVerify(atLeast = 0) { databaseQueries.delete(id) }
+    }
+
+    @Test
+    fun `test removeAll debe ejecutarse `() = runTest {
+
+        coEvery { databaseQueries.removeAll() } just Runs
+
+        val result = repository.removeAll().first()
+
+        assertAll(
+            { assertTrue(result.isOk) },
+        )
+
+        coVerify(atLeast = 1) { databaseQueries.removeAll() }
+    }
+
+
+    @Test
+    fun `test saveAll almacena una lista de tenistas`() = runTest {
+        val tenistas = listOf(
+            testTenista,
+            testTenista.copy(id = 2, nombre = "Roger Federer"),
+            testTenista.copy(id = 3, nombre = "Novak Djokovic")
+        )
+
+        coEvery {
+            databaseQueries.transaction(
+                noEnclosing = false,
+                any<TransactionWithoutReturn.() -> Unit>()
+            )
+        } coAnswers {
+            it.invocation.args[0]
+        }
+
+
+        coEvery {
+            databaseQueries.selectLastInserted().executeAsOne()
+        } returns testTenista.toTenistaEntity()
+
+        val result = repository.saveAll(tenistas).first()
+
+        assertAll(
+            { assertTrue(result.isOk) },
+            { assertEquals(tenistas.size, result.value) }
+        )
+
+        coVerify(atLeast = 1) {
+            databaseQueries.transaction(
+                noEnclosing = false,
+                any<TransactionWithoutReturn.() -> Unit>()
+            )
+        }
+
     }
 
 }

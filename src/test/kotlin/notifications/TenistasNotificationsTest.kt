@@ -30,7 +30,8 @@ class TenistasNotificationsTest {
             updatedAt = LocalDateTime.now(),
             isDeleted = false
         )
-        val notification = Notification(Notification.Type.CREATE, testTenista, LocalDateTime.now())
+        val notification =
+            Notification(Notification.Type.CREATE, testTenista, "Creación de tenista", LocalDateTime.now())
         val tenistasNotifications = TenistasNotifications()
 
         // Act
