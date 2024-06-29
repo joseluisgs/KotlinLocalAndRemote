@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.test.Test
@@ -344,5 +345,225 @@ class TenistasServiceImplTest {
     }
 
     // delete
+
+    @Test
+    fun `delete debe retornar tenista borrado`() = runTest {
+        val id = testTenista.id
+
+        // Suponemos que esta en la cache
+        every { cache.get(id) } returns testTenista
+        coEvery { localRepository.delete(id) } returns flowOf(Ok(Unit))
+        coEvery { remoteRepository.delete(id) } returns flowOf(Ok(Unit))
+        every { cache.remove(id) } returns Unit
+        coEvery { notificationsService.send(any()) } returns Unit
+
+        val result = service.delete(id).first()
+
+        assertAll("Debemos obtener tenista borrado",
+            { assertTrue(result.isOk) },
+            { assertEquals(Unit, result.get()) }
+        )
+
+        coVerify(atLeast = 1) { localRepository.delete(id) }
+        coVerify(atLeast = 1) { remoteRepository.delete(id) }
+        verify(atLeast = 1) { cache.remove(id) }
+        coVerify(atLeast = 1) { notificationsService.send(any()) }
+        verify(atLeast = 1) { cache.get(id) }
+    }
+
+    @Test
+    fun `delete debe retornar error si no se puede borrar remotamente`() = runTest {
+        val id = testTenista.id
+
+        // Suponemos que esta en la cache
+        every { cache.get(id) } returns testTenista
+        coEvery { localRepository.delete(id) } returns flowOf(Ok(Unit))
+        coEvery { remoteRepository.delete(id) } returns flowOf((Err(TenistaError.RemoteError("Error"))))
+
+        val result = service.delete(id).first()
+
+        assertAll("Debemos obtener error",
+            { assertTrue(result.isErr) },
+            { assertEquals(TenistaError.RemoteError("Error").message, result.error.message) }
+        )
+
+        coVerify(atLeast = 1) { localRepository.delete(id) }
+        coVerify(atLeast = 1) { remoteRepository.delete(id) }
+        verify(atLeast = 1) { cache.get(id) }
+    }
+
+    @Test
+    fun `delete debe retornar error si no se puede borrar localmente`() = runTest {
+        val id = testTenista.id
+
+        // Suponemos que esta en la cache
+        every { cache.get(id) } returns testTenista
+        coEvery { remoteRepository.delete(id) } returns flowOf(Ok(Unit))
+        coEvery { localRepository.delete(id) } returns flowOf((Err(TenistaError.NotFound(id))))
+
+        val result = service.delete(id).first()
+
+        assertAll("Debemos obtener error",
+            { assertTrue(result.isErr) },
+            { assertEquals(TenistaError.NotFound(id).message, result.error.message) }
+        )
+
+        coVerify(atLeast = 1) { localRepository.delete(id) }
+        verify(atLeast = 1) { cache.get(id) }
+    }
+
+    @Test
+    fun `import debe devolver Ok para fichero CSV`() = runTest {
+        val file = File("test.csv")
+
+        coEvery { csvStorage.import(file) } returns flowOf(Ok(listOf(testTenista)))
+        coEvery { localRepository.removeAll() } returns flowOf(Ok(Unit))
+        coEvery { remoteRepository.save(testTenista) } returns flowOf(Ok(testTenista))
+        coEvery { localRepository.save(testTenista) } returns flowOf(Ok(testTenista))
+
+        val result = service.import(file).first()
+
+        assertAll("Debemos obtener lista de tenistas",
+            { assertTrue(result.isOk) },
+            { assertEquals(listOf(testTenista).size, result.value) }
+        )
+
+        coVerify(atLeast = 1) { csvStorage.import(file) }
+        coVerify(atLeast = 1) { localRepository.removeAll() }
+        coVerify(atLeast = 1) { remoteRepository.save(testTenista) }
+    }
+
+    @Test
+    fun `import debe devolver Ok para fichero JSON`() = runTest {
+        val file = File("test.json")
+
+        coEvery { jsonStorage.import(file) } returns flowOf(Ok(listOf(testTenista)))
+        coEvery { localRepository.removeAll() } returns flowOf(Ok(Unit))
+        coEvery { remoteRepository.save(testTenista) } returns flowOf(Ok(testTenista))
+        coEvery { localRepository.save(testTenista) } returns flowOf(Ok(testTenista))
+
+        val result = service.import(file).first()
+
+        assertAll("Debemos obtener lista de tenistas",
+            { assertTrue(result.isOk) },
+            { assertEquals(listOf(testTenista).size, result.value) }
+        )
+
+        coVerify(atLeast = 1) { jsonStorage.import(file) }
+        coVerify(atLeast = 1) { localRepository.removeAll() }
+        coVerify(atLeast = 1) { remoteRepository.save(testTenista) }
+    }
+
+    @Test
+    fun `import debe devolver error si no se puede importar`() = runTest {
+        val file = File("test.csv")
+
+        coEvery { csvStorage.import(file) } returns flowOf((Err(TenistaError.StorageError("Error"))))
+
+        val result = service.import(file).first()
+
+        assertAll("Debemos obtener error",
+            { assertTrue(result.isErr) },
+            { assertEquals(TenistaError.StorageError("Error").message, result.error.message) }
+        )
+
+        coVerify(atLeast = 1) { csvStorage.import(file) }
+    }
+
+
+    @Test
+    fun `export debe devolver Ok para fichero CSV de manera local`() = runTest {
+        val file = File("test.csv")
+
+        coEvery { localRepository.getAll() } returns flowOf(Ok(listOf(testTenista)))
+        coEvery { csvStorage.export(file, listOf(testTenista)) } returns flowOf(Ok(1))
+
+        val result = service.export(file, false).first()
+
+        assertAll("Debemos obtener Ok",
+            { assertTrue(result.isOk) },
+            { assertEquals(1, result.value) }
+        )
+
+        coVerify(atLeast = 1) { localRepository.getAll() }
+        coVerify(atLeast = 1) { csvStorage.export(file, listOf(testTenista)) }
+    }
+
+    @Test
+    fun `export debe devolver Ok para fichero CSV de manera remota`() = runTest {
+        val file = File("test.csv")
+
+        coEvery { remoteRepository.getAll() } returns flowOf(Ok(listOf(testTenista)))
+        coEvery { csvStorage.export(file, listOf(testTenista)) } returns flowOf(Ok(1))
+
+        val result = service.export(file, true).first()
+
+        assertAll("Debemos obtener Ok",
+            { assertTrue(result.isOk) },
+            { assertEquals(1, result.value) }
+        )
+
+        coVerify(atLeast = 1) { remoteRepository.getAll() }
+        coVerify(atLeast = 1) { csvStorage.export(file, listOf(testTenista)) }
+    }
+
+    @Test
+    fun `export debe devolver Ok para fichero Json de manera local`() = runTest {
+        val file = File("test.json")
+
+        coEvery { localRepository.getAll() } returns flowOf(Ok(listOf(testTenista)))
+        coEvery { jsonStorage.export(file, listOf(testTenista)) } returns flowOf(Ok(1))
+
+        val result = service.export(file, false).first()
+
+        assertAll("Debemos obtener Ok",
+            { assertTrue(result.isOk) },
+            { assertEquals(1, result.value) }
+        )
+
+        coVerify(atLeast = 1) { localRepository.getAll() }
+        coVerify(atLeast = 1) { jsonStorage.export(file, listOf(testTenista)) }
+    }
+
+    @Test
+    fun `export debe devolver Ok para fichero Json remota`() = runTest {
+        val file = File("test.json")
+
+        coEvery { remoteRepository.getAll() } returns flowOf(Ok(listOf(testTenista)))
+        coEvery { jsonStorage.export(file, listOf(testTenista)) } returns flowOf(Ok(1))
+
+        val result = service.export(file, true).first()
+
+        assertAll("Debemos obtener Ok",
+            { assertTrue(result.isOk) },
+            { assertEquals(1, result.value) }
+        )
+
+        coVerify(atLeast = 1) { remoteRepository.getAll() }
+        coVerify(atLeast = 1) { jsonStorage.export(file, listOf(testTenista)) }
+    }
+
+    @Test
+    fun `export debe devolver error si no se puede exportar`() = runTest {
+        val file = File("test.csv")
+
+        coEvery { localRepository.getAll() } returns flowOf(Ok(listOf(testTenista)))
+        coEvery {
+            csvStorage.export(
+                file,
+                listOf(testTenista)
+            )
+        } returns flowOf((Err(TenistaError.StorageError("Error"))))
+
+        val result = service.export(file, false).first()
+
+        assertAll("Debemos obtener error",
+            { assertTrue(result.isErr) },
+            { assertEquals(TenistaError.StorageError("Error").message, result.error.message) }
+        )
+
+        coVerify(atLeast = 1) { localRepository.getAll() }
+        coVerify(atLeast = 1) { csvStorage.export(file, listOf(testTenista)) }
+    }
 
 }

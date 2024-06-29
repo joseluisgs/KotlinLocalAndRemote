@@ -177,6 +177,7 @@ class TenistasServiceImpl(
                             message = "Tenista borrado con id: $id"
                         )
                     )
+                    cache.remove(id)
                     emit(Ok(Unit))
                 },
                 failure = { emit(Err(it)) }
