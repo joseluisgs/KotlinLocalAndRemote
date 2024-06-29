@@ -2,6 +2,21 @@
 
 ![Kotlin](./images/kotlin.webp)
 
+- [Kotlin Local and Remote](#kotlin-local-and-remote)
+  - [Acerca de](#acerca-de)
+  - [Programación asíncrona y reactiva](#programación-asíncrona-y-reactiva)
+  - [Railway Oriented Programming](#railway-oriented-programming)
+  - [Almacenamiento y Serialización](#almacenamiento-y-serialización)
+  - [Cache en Memoria](#cache-en-memoria)
+  - [Repositorio Local](#repositorio-local)
+  - [Repositorio Remoto](#repositorio-remoto)
+  - [Validador](#validador)
+  - [Notificaciones](#notificaciones)
+  - [Servicio](#servicio)
+  - [Tests](#tests)
+  - [Inyección de Dependencias](#inyección-de-dependencias)
+
+
 ## Acerca de
 
 Este proyecto es un ejemplo de como crear un servicio para el almacenamiento de datos Kotlin.
