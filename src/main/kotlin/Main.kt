@@ -74,6 +74,11 @@ class App : KoinComponent {
                 }
         }
 
+        // Iniciamos el refresco automático de tenistas (podróas hacerlo con una corrutina, pero ya esta implementada dentro, es para que veas otra forma
+        // Si no sería como las notificaciones
+        // Si no quieres refresh automático, usa loadData para cargar los datos por primera vez o getAll para obtenerlos
+        tenistasService.refresh()
+
         delay(2000)
 
         // Obtenemos todos los tenistas

@@ -11,6 +11,7 @@ import dev.joseluisgs.repository.TenistasRepositoryRemote
 import dev.joseluisgs.rest.API_TENISTAS_URL
 import dev.joseluisgs.rest.TenistasApiRest
 import dev.joseluisgs.rest.getKtorFitClient
+import dev.joseluisgs.service.REFRESH_TIME
 import dev.joseluisgs.service.TenistasServiceImpl
 import dev.joseluisgs.storage.TenistasStorageCsv
 import dev.joseluisgs.storage.TenistasStorageJson
@@ -47,7 +48,7 @@ val appModule = module {
             csvStorage = get(),
             jsonStorage = get(),
             notificationsService = get(),
-            autoRefresh = getProperty("auto.refresh", true)
+            autoRefresh = getProperty("auto.refresh", REFRESH_TIME)
         )
     }
 

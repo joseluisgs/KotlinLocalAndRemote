@@ -19,7 +19,6 @@ import kotlin.coroutines.CoroutineContext
 
 
 private val logger = logging()
-private const val REFRESH_TIME = 5000L // 5 segundos
 
 
 class TenistasServiceImpl(
@@ -29,43 +28,28 @@ class TenistasServiceImpl(
     private val csvStorage: TenistasStorageCsv,
     private val jsonStorage: TenistasStorageJson,
     private val notificationsService: TenistasNotifications,
-    private val autoRefresh: Boolean = false
-
+    autoRefresh: Long = REFRESH_TIME,
 ) : TenistasService {
 
     val notifications: SharedFlow<Notification<Tenista>>
         get() = notificationsService.notifications
 
 
-    init {
-
-        // Iniciamos le refresh de los datos
-
+    override fun refresh() {
+        // Lanzamos una corutina para que se ejecute en segundo plano, y así no llamarlo en el hilo principal
         val job = Job()
         val coroutineContext: CoroutineContext = Dispatchers.IO + job
         logger.debug { "Inicializando TenistasServiceImpl" }
-
         CoroutineScope(coroutineContext).launch {
-            if (autoRefresh) {
-                refresh()
-            } else {
+            do {
+                logger.debug { "Refrescando el repositorio local con los datos remotos " }
                 loadData()
-            }
+                delay(REFRESH_TIME)
+            } while (true)
         }
-
     }
 
-
-    private suspend fun refresh() {
-        // Lanzamos una corutina para que se ejecute en segundo plano
-        do {
-            logger.debug { "Refrescando el repositorio local con los datos remotos " }
-            loadData()
-            delay(REFRESH_TIME)
-        } while (true)
-    }
-
-    private suspend fun loadData() {
+    override suspend fun loadData() {
         localRepository.removeAll().first() // Borramos los datos locales
             .andThen { remoteRepository.getAll().first() } // Obtenemos los datos remotos
             .andThen { localRepository.saveAll(it).first() }.also {
@@ -90,13 +74,13 @@ class TenistasServiceImpl(
                 failure = { emit(Err(it)) }
             )
         } else {
-            // Devolvemos los datos remotos
-            remoteRepository.getAll().first().mapBoth(
-                success = { emit(Ok(it)) },
-                failure = {
-                    emit(Err(it))
-                }
-            )
+            localRepository.removeAll().first() // Borramos los datos locales
+                .andThen { remoteRepository.getAll().first() } // Obtenemos los datos remotos
+                .andThen { localRepository.saveAll(it).first() }
+                .andThen { localRepository.getAll().first() }.mapBoth(
+                    success = { emit(Ok(it)) },
+                    failure = { emit(Err(it)) }
+                )
         }
     }.flowOn(Dispatchers.IO)
 
@@ -226,14 +210,18 @@ class TenistasServiceImpl(
         logger.debug { "Guardando todos los tenistas: ${tenistas.size}" }
         // Recorro los tenistas y los guardo en remoto y local
         var contador = 0
-        localRepository.removeAll().first()
-        tenistas.forEach {
-            remoteRepository.save(it).first().andThen { t -> localRepository.save(t).first() }.mapBoth(
-                success = { contador++ },
-                failure = { e -> return Err(e) }
-            )
-        }
+        localRepository.removeAll().first().mapBoth(
+            success = {
+                tenistas.forEach { tenista ->
+                    remoteRepository.save(tenista).first()
+                        .andThen { localRepository.save(it).first() }
+                        .andThen { Ok(contador++) }
+                }
+            },
+            failure = { return Err(it) }
+        )
         return Ok(contador)
+
     }
 
     override fun export(file: File, fromRemote: Boolean): Flow<Result<Int, TenistaError>> = flow {

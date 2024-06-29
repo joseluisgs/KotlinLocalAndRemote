@@ -6,6 +6,8 @@ import dev.joseluisgs.models.Tenista
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
+const val REFRESH_TIME = 5000L // 5 segundos
+
 interface TenistasService {
     fun getAll(fromRemote: Boolean): Flow<Result<List<Tenista>, TenistaError>>
     fun getById(id: Long): Flow<Result<Tenista, TenistaError>>
@@ -14,5 +16,6 @@ interface TenistasService {
     fun delete(id: Long): Flow<Result<Unit, TenistaError>>
     fun import(file: File): Flow<Result<Int, TenistaError>>
     fun export(file: File, fromRemote: Boolean): Flow<Result<Int, TenistaError>>
-
+    fun refresh()
+    suspend fun loadData()
 }

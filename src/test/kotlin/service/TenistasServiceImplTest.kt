@@ -12,15 +12,20 @@ import dev.joseluisgs.repository.TenistasRepositoryRemote
 import dev.joseluisgs.service.TenistasServiceImpl
 import dev.joseluisgs.storage.TenistasStorageCsv
 import dev.joseluisgs.storage.TenistasStorageJson
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import io.mockk.verify
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import java.io.File
@@ -76,7 +81,7 @@ class TenistasServiceImplTest {
         updatedAt = LocalDateTime.now(),
         isDeleted = false
     )
-    
+
 
     @Test
     fun `getAll debe retornar lista de tenistas localmente`() = runTest {
@@ -95,7 +100,8 @@ class TenistasServiceImplTest {
     @Test
     fun `getAll debe retornar lista de tenistas remota`() = runTest {
         coEvery { remoteRepository.getAll() } returns flowOf(Ok(listOf(testTenista)))
-
+        coEvery { localRepository.saveAll(any()) } returns flowOf(Ok(1))
+        coEvery { localRepository.removeAll() } returns flowOf(Ok(Unit))
         val result = service.getAll(true).first()
 
         assertAll("Debemos obtener lista de tenistas",
@@ -104,6 +110,8 @@ class TenistasServiceImplTest {
         )
 
         coVerify(atLeast = 1) { remoteRepository.getAll() }
+        coVerify(atLeast = 1) { localRepository.saveAll(any()) }
+        coVerify(atLeast = 1) { localRepository.removeAll() }
     }
 
     @Test
@@ -559,6 +567,51 @@ class TenistasServiceImplTest {
 
         coVerify(atLeast = 1) { localRepository.getAll() }
         coVerify(atLeast = 1) { csvStorage.export(file, listOf(testTenista)) }
+    }
+
+    @Test
+    fun `load data debe cargar los datos`() = runTest {
+        coEvery { localRepository.removeAll() } returns flowOf(Ok(Unit))
+        coEvery { remoteRepository.getAll() } returns flowOf(Ok(listOf(testTenista)))
+        coEvery { localRepository.saveAll(any()) } returns flowOf(Ok(1))
+        coEvery { notificationsService.send(any()) } returns Unit
+        every { cache.clear() } returns Unit
+
+
+        // Llamar al método que deseas probar
+        service.loadData()
+
+        // Verifica que las llamadas esperadas a los métodos se hayan realizado
+        coVerify(atLeast = 1) { localRepository.removeAll() }
+        coVerify(atLeast = 1) { remoteRepository.getAll() }
+        coVerify(atLeast = 1) { localRepository.saveAll(any()) }
+        coVerify(atLeast = 1) { notificationsService.send(any()) }
+        verify(atLeast = 1) { cache.clear() }
+    }
+
+    @Test
+    fun `refresh debe actualizar los datos`() = runTest {
+        // Define los comportamientos esperados de tus mocks
+        coEvery { localRepository.removeAll() } returns flowOf(Ok(Unit))
+        coEvery { remoteRepository.getAll() } returns flowOf(Ok(listOf(testTenista)))
+        coEvery { localRepository.saveAll(any()) } returns flowOf(Ok(1))
+        coEvery { notificationsService.send(any()) } returns Unit
+        every { cache.clear() } returns Unit
+
+        // Llamar al método que deseas probar
+        val job = launch { service.refresh() }
+
+        delay(1000) // Permitir que la corutina se ejecute por un tiempo específico y con ello se realicen las llamadas
+
+
+        job.cancelAndJoin() // Cancelar la corutina después de la prueba
+
+        // Verifica que las llamadas esperadas a los métodos se hayan realizado
+        coVerify(atLeast = 1) { localRepository.removeAll() }
+        coVerify(atLeast = 1) { remoteRepository.getAll() }
+        coVerify(atLeast = 1) { localRepository.saveAll(any()) }
+        coVerify(atLeast = 1) { notificationsService.send(any()) }
+        verify(atLeast = 1) { cache.clear() }
     }
 
 }
