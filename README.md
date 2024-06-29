@@ -213,5 +213,13 @@ necesarias.
 Enlace a
 los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/1512d25e017d8c6e5a0224641ade634efe1411b4).
 
+## Inyección de Dependencias
 
+Para la inyección de dependencias hemos usado [Koin](https://insert-koin.io/), una librería que nos permite inyectar
+dependencias de forma sencilla y eficiente. Nos permite definir los módulos y las dependencias existentes, ya sea manual
+o con anotaciones.
+Además, nos permite inyectar propiedades desde un archivo de propiedades.
+Finalmente nos permite poder testear nuestros módulos.
 
+Enlace a
+los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/3fe6a52f4645714b717ad2739c69a2d7a21cb90e).
