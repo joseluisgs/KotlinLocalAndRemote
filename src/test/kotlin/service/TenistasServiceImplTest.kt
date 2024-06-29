@@ -229,4 +229,120 @@ class TenistasServiceImplTest {
         coVerify(atLeast = 0) { remoteRepository.save(newTenista) }
     }
 
+    @Test
+    fun `save debe retornar error si no se puede guardar remotamente`() = runTest {
+        val newTenista = testTenista.copy(id = Tenista.NEW_ID, nombre = "Test New", puntos = 10)
+
+        coEvery { remoteRepository.save(newTenista) } returns flowOf((Err(TenistaError.RemoteError("Error"))))
+
+        val result = service.save(newTenista).first()
+
+        assertAll("Debemos obtener error",
+            { assertTrue(result.isErr) },
+            { assertEquals(TenistaError.RemoteError("Error").message, result.error.message) }
+        )
+
+        coVerify(atLeast = 0) { localRepository.save(newTenista) }
+        coVerify(atLeast = 1) { remoteRepository.save(newTenista) }
+    }
+
+    // update
+    @Test
+    fun `update debe retornar tenista actualizado`() = runTest {
+        val updatedTenista = testTenista.copy(nombre = "Test Update", puntos = 20)
+
+        // Suponemos que esta en la cache
+        every { cache.get(updatedTenista.id) } returns updatedTenista
+        coEvery { localRepository.update(updatedTenista.id, updatedTenista) } returns flowOf(Ok(updatedTenista))
+        coEvery { remoteRepository.update(updatedTenista.id, updatedTenista) } returns flowOf(Ok(updatedTenista))
+        every { cache.put(updatedTenista.id, updatedTenista) } returns Unit
+        coEvery { notificationsService.send(any()) } returns Unit
+
+        val result = service.update(updatedTenista.id, updatedTenista).first()
+
+        assertAll("Debemos obtener tenista actualizado",
+            { assertTrue(result.isOk) },
+            { assertEquals(updatedTenista, result.get()) }
+        )
+
+        coVerify(atLeast = 1) { localRepository.update(updatedTenista.id, updatedTenista) }
+        coVerify(atLeast = 1) { remoteRepository.update(updatedTenista.id, updatedTenista) }
+        verify(atLeast = 1) { cache.put(updatedTenista.id, updatedTenista) }
+        coVerify(atLeast = 1) { notificationsService.send(any()) }
+        verify(atLeast = 1) { cache.get(updatedTenista.id) }
+    }
+
+    @Test
+    fun `update debe retornar error si no se puede actualizar por validación`() = runTest {
+        val updatedTenista = testTenista.copy(nombre = "Test Update", puntos = -20)
+
+        // Suponemos que esta en la cache
+        every { cache.get(updatedTenista.id) } returns updatedTenista
+
+        val result = service.update(updatedTenista.id, updatedTenista).first()
+
+        assertAll("Debemos obtener error",
+            { assertTrue(result.isErr) },
+            {
+                assertEquals(
+                    TenistaError.ValidationError("Los puntos no pueden ser negativos").message,
+                    result.error.message
+                )
+            }
+        )
+
+        coVerify(atLeast = 0) { localRepository.update(updatedTenista.id, updatedTenista) }
+        coVerify(atLeast = 0) { remoteRepository.update(updatedTenista.id, updatedTenista) }
+        verify(atLeast = 1) { cache.get(updatedTenista.id) }
+    }
+
+    @Test
+    fun `update debe retornar error si no se puede actualizar remotamente`() = runTest {
+        val updatedTenista = testTenista.copy(nombre = "Test Update", puntos = 20)
+
+        // Suponemos que esta en la cache
+        every { cache.get(updatedTenista.id) } returns updatedTenista
+        coEvery {
+            remoteRepository.update(
+                updatedTenista.id,
+                updatedTenista
+            )
+        } returns flowOf((Err(TenistaError.RemoteError("Error"))))
+
+        val result = service.update(updatedTenista.id, updatedTenista).first()
+
+        assertAll("Debemos obtener error",
+            { assertTrue(result.isErr) },
+            { assertEquals(TenistaError.RemoteError("Error").message, result.error.message) }
+        )
+
+        coVerify(atLeast = 0) { localRepository.update(updatedTenista.id, updatedTenista) }
+        coVerify(atLeast = 1) { remoteRepository.update(updatedTenista.id, updatedTenista) }
+        verify(atLeast = 1) { cache.get(updatedTenista.id) }
+    }
+
+    @Test
+    fun `update debe retornar error porque el tenista no existe remotamente`() = runTest {
+        val updatedTenista = testTenista.copy(nombre = "Test Update", puntos = 20)
+
+        // Suponemos que esta en la cache y local
+        every { cache.get(updatedTenista.id) } returns null
+        coEvery { localRepository.getById(updatedTenista.id) } returns flowOf(Err(TenistaError.NotFound(updatedTenista.id)))
+        coEvery { remoteRepository.getById(updatedTenista.id) } returns flowOf(Err(TenistaError.RemoteError("Error")))
+
+        val result = service.update(updatedTenista.id, updatedTenista).first()
+
+        assertAll("Debemos obtener error",
+            { assertTrue(result.isErr) },
+            { assertEquals(TenistaError.RemoteError("Error").message, result.error.message) }
+        )
+
+        coVerify(atLeast = 0) { localRepository.update(updatedTenista.id, updatedTenista) }
+        coVerify(atLeast = 0) { remoteRepository.update(updatedTenista.id, updatedTenista) }
+        verify(atLeast = 0) { cache.get(updatedTenista.id) }
+
+    }
+
+    // delete
+
 }
