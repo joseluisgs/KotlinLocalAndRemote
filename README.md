@@ -200,6 +200,18 @@ crearemos una interfaz `Service` que definirá las operaciones de lectura y escr
 De esta manera, podremos utilizar el servicio en nuestra aplicación para almacenar y recuperar los datos de forma
 sencilla y eficiente.
 
-Enlace a los [commit de la sección]().
+Enlace a
+los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/1512d25e017d8c6e5a0224641ade634efe1411b4).
+
+## Tests
+
+A la hora de realizar los tests, hemos usado [MockK](https://mockk.io/) para simular los objetos y las operaciones de
+forma sencilla y eficiente. Nos permite crear mocks y trabajar con corrutinas o código asíncrono de forma sencilla.
+De esta manera, hemos podido realizar los tests creando los dobles de las dependencias y simulando las operaciones
+necesarias.
+
+Enlace a
+los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/1512d25e017d8c6e5a0224641ade634efe1411b4).
+
 
 
