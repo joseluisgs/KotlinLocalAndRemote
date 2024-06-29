@@ -1,4 +1,4 @@
-package notifications
+package notification
 
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.notifications.Notification

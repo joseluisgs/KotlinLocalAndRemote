@@ -3,7 +3,7 @@ package service
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.get
-import dev.joseluisgs.cache.Cache
+import dev.joseluisgs.cache.TenistasCache
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.notifications.TenistasNotifications
@@ -49,7 +49,7 @@ class TenistasServiceImplTest {
     lateinit var remoteRepository: TenistasRepositoryRemote
 
     @MockK
-    lateinit var cache: Cache<Long, Tenista>
+    lateinit var cache: TenistasCache
 
     @MockK
     lateinit var csvStorage: TenistasStorageCsv

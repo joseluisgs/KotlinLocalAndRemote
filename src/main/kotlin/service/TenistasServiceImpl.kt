@@ -1,7 +1,7 @@
 package dev.joseluisgs.service
 
 import com.github.michaelbull.result.*
-import dev.joseluisgs.cache.Cache
+import dev.joseluisgs.cache.TenistasCache
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.notifications.Notification
@@ -19,12 +19,12 @@ import kotlin.coroutines.CoroutineContext
 
 
 private val logger = logging()
-private const val REFRESH_TIME = 15000L // 15 segundos
+private const val REFRESH_TIME = 5000L // 5 segundos
 
 class TenistasServiceImpl(
     private val localRepository: TenistasRepositoryLocal,
     private val remoteRepository: TenistasRepositoryRemote,
-    private val cache: Cache<Long, Tenista>,
+    private val cache: TenistasCache,
     private val csvStorage: TenistasStorageCsv,
     private val jsonStorage: TenistasStorageJson,
     private val notificationsService: TenistasNotifications,

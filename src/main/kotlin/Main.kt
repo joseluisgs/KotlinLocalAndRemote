@@ -3,7 +3,7 @@ package dev.joseluisgs
 import com.github.michaelbull.result.mapBoth
 import database.SqlDeLightManager
 import database.createDatabase
-import dev.joseluisgs.cache.TenistasCache
+import dev.joseluisgs.cache.TenistasCacheImpl
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.notifications.Notification
 import dev.joseluisgs.notifications.TenistasNotifications
@@ -32,7 +32,7 @@ fun main(): Unit = runBlocking {
     val tenistasService = TenistasServiceImpl(
         localRepository = TenistasRepositoryLocal(SqlDeLightManager(createDatabase("tenistas.db"))),
         remoteRepository = TenistasRepositoryRemote(getKtorFitClient(API_TENISTAS_URL).create()),
-        cache = TenistasCache(size = 5),
+        cache = TenistasCacheImpl(size = 5),
         csvStorage = TenistasStorageCsv(),
         jsonStorage = TenistasStorageJson(),
         notificationsService = TenistasNotifications(),
@@ -175,7 +175,7 @@ fun main(): Unit = runBlocking {
     )
 
     // Esperamos 3 segundos
-    //delay(3000)
+    delay(5000)
     println("🔇 Desactivamos la escucha de notificaciones de tenistas 🔇")
     notificationJob.cancel() // Cancelamos la escucha de notificaciones, porque ya no nos interesa
 

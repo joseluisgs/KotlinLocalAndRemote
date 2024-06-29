@@ -191,3 +191,15 @@ antiguos.
 
 Enlace a
 los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/a742db9eeec1e5dea2d2c8871efde528510f3af7).
+
+## Servicio
+
+El siguiente paso es crear un servicio que encapsule los repositorios local y remoto y la caché en memoria. Para ello,
+crearemos una interfaz `Service` que definirá las operaciones de lectura y escritura de datos.
+
+De esta manera, podremos utilizar el servicio en nuestra aplicación para almacenar y recuperar los datos de forma
+sencilla y eficiente.
+
+Enlace a los [commit de la sección]().
+
+
