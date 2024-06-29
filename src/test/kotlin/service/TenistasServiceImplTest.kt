@@ -76,11 +76,7 @@ class TenistasServiceImplTest {
         updatedAt = LocalDateTime.now(),
         isDeleted = false
     )
-
-    @BeforeEach
-    fun setUp() {
-        MockKAnnotations.init(this, relaxUnitFun = true)
-    }
+    
 
     @Test
     fun `getAll debe retornar lista de tenistas localmente`() = runTest {
@@ -436,7 +432,6 @@ class TenistasServiceImplTest {
     @Test
     fun `import debe devolver Ok para fichero JSON`() = runTest {
         val file = File("test.json")
-
         coEvery { jsonStorage.import(file) } returns flowOf(Ok(listOf(testTenista)))
         coEvery { localRepository.removeAll() } returns flowOf(Ok(Unit))
         coEvery { remoteRepository.save(testTenista) } returns flowOf(Ok(testTenista))

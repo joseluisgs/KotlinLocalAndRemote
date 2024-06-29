@@ -6,7 +6,9 @@ import org.lighthousegames.logging.logging
 
 private val logger = logging()
 
-class SqlDeLightManager(val queries: DatabaseQueries)
+class SqlDeLightManager(
+    val queries: DatabaseQueries
+)
 
 fun createInMemoryDatabase(): DatabaseQueries {
     return JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY).let { driver ->

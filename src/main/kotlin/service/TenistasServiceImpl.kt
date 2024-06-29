@@ -21,6 +21,7 @@ import kotlin.coroutines.CoroutineContext
 private val logger = logging()
 private const val REFRESH_TIME = 5000L // 5 segundos
 
+
 class TenistasServiceImpl(
     private val localRepository: TenistasRepositoryLocal,
     private val remoteRepository: TenistasRepositoryRemote,
@@ -39,12 +40,16 @@ class TenistasServiceImpl(
     init {
 
         // Iniciamos le refresh de los datos
-        if (autoRefresh) {
-            val job = Job()
-            val coroutineContext: CoroutineContext = Dispatchers.IO + job
-            logger.debug { "Inicializando TenistasServiceImpl" }
-            CoroutineScope(coroutineContext).launch {
+
+        val job = Job()
+        val coroutineContext: CoroutineContext = Dispatchers.IO + job
+        logger.debug { "Inicializando TenistasServiceImpl" }
+
+        CoroutineScope(coroutineContext).launch {
+            if (autoRefresh) {
                 refresh()
+            } else {
+                loadData()
             }
         }
 
@@ -55,20 +60,24 @@ class TenistasServiceImpl(
         // Lanzamos una corutina para que se ejecute en segundo plano
         do {
             logger.debug { "Refrescando el repositorio local con los datos remotos " }
-            localRepository.removeAll().first() // Borramos los datos locales
-                .andThen { remoteRepository.getAll().first() } // Obtenemos los datos remotos
-                .andThen { localRepository.saveAll(it).first() }.also {
-                    // Enviamos la notificación de refresco
-                    notificationsService.send(
-                        Notification(
-                            type = Notification.Type.REFRESH,
-                            message = "Nuevos datos disponibles: ${it.value}"
-                        )
-                    )
-                    cache.clear() // Limpiamos la cache
-                }
+            loadData()
             delay(REFRESH_TIME)
         } while (true)
+    }
+
+    private suspend fun loadData() {
+        localRepository.removeAll().first() // Borramos los datos locales
+            .andThen { remoteRepository.getAll().first() } // Obtenemos los datos remotos
+            .andThen { localRepository.saveAll(it).first() }.also {
+                // Enviamos la notificación de refresco
+                notificationsService.send(
+                    Notification(
+                        type = Notification.Type.REFRESH,
+                        message = "Nuevos datos disponibles: ${it.value}"
+                    )
+                )
+                cache.clear() // Limpiamos la cache
+            }
     }
 
 

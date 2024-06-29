@@ -39,6 +39,11 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:2.3.10")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.10")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.10")
+    // Koin DI
+    // Koin, con BOM ya se instalan todas las dependencias necesarias con la versión correcta
+    implementation(platform("io.insert-koin:koin-bom:3.5.6"))
+    implementation("io.insert-koin:koin-core") // Core
+    implementation("io.insert-koin:koin-test") // Para test y usar checkModules
 
     // Para test
     testImplementation(kotlin("test"))
