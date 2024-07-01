@@ -22,23 +22,27 @@ class TenistasStorageJson : TenistasStorage {
     override fun import(file: File): Flow<Result<List<Tenista>, TenistaError.StorageError>> = flow {
         logger.debug { "Importando Tenistas desde JSON asíncrono: $file" }
         // Si el fichero no existe, devolvemos un error
-        if (!file.exists()) {
-            emit(Err(TenistaError.StorageError("El fichero no existe ${file.absolutePath}")))
-        } else {
-            // Leemos el fichero y emitimos el resultado
-            emit(readLines(file))
-        }
+        // Leemos el fichero y emitimos el resultado
+        emit(readLines(file))
+
     }.flowOn(Dispatchers.IO) // Cambiamos el contexto de ejecución a IO
 
-    private fun readLines(file: File): Result<List<Tenista>, TenistaError.StorageError> = try {
+    private fun readLines(file: File): Result<List<Tenista>, TenistaError.StorageError> {
         // Creamos el serializador de JSON
-        val json = Json { ignoreUnknownKeys = true; encodeDefaults = false; isLenient = true }
-        // Leemos el fichero y lo convertimos a Tenista
-        val tenistas = json.decodeFromString<List<TenistaDto>>(file.readText()).map { it.toTenista() }
-        Ok(tenistas) // Devolvemos los tenistas
-    } catch (e: Exception) {
-        logger.error(e) { "Error al leer el fichero: ${file.absolutePath}" }
-        Err(TenistaError.StorageError("ERROR al leer el fichero ${file.absolutePath}: ${e.message}"))
+        return if (!file.exists()) {
+            Err(TenistaError.StorageError("El fichero no existe ${file.absolutePath}"))
+        } else {
+
+            try {
+                val json = Json { ignoreUnknownKeys = true; encodeDefaults = false; isLenient = true }
+                // Leemos el fichero y lo convertimos a Tenista
+                val tenistas = json.decodeFromString<List<TenistaDto>>(file.readText()).map { it.toTenista() }
+                Ok(tenistas) // Devolvemos los tenistas
+            } catch (e: Exception) {
+                logger.error(e) { "Error al leer el fichero: ${file.absolutePath}" }
+                Err(TenistaError.StorageError("ERROR al leer el fichero ${file.absolutePath}: ${e.message}"))
+            }
+        }
     }
 
 

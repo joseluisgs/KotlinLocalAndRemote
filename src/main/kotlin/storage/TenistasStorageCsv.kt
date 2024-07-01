@@ -22,11 +22,8 @@ class TenistasStorageCsv : TenistasStorage {
         logger.debug { "Importando Tenistas desde CSV asíncrono: $file" }
 
         // Código de lectura del fichero
-        if (!file.exists()) {
-            emit(Err(TenistaError.StorageError("ERROR: El fichero no existe ${file.absolutePath}")))
-        } else {
-            emit(readLines(file))
-        }
+        emit(readLines(file))
+
     }.flowOn(Dispatchers.IO) // Cambiamos el contexto de ejecución
 
 
@@ -53,17 +50,21 @@ class TenistasStorageCsv : TenistasStorage {
 
 
     private fun readLines(file: File): Result<List<Tenista>, TenistaError.StorageError> {
-        return try {
-            // Código de lectura del fichero
-            logger.debug { "Leyendo líneas del fichero: ${file.absolutePath}" }
-            return Ok(file.readLines(Charsets.UTF_8)
-                .drop(1) // Nos saltamos la cabecera
-                .map { line -> line.split(",") } // Separamos por ,
-                .map { parts -> parseLine(parts) } // Parseamos la línea
-            )
-        } catch (e: Exception) {
-            logger.error(e) { "Error al leer el fichero: ${file.absolutePath}" }
-            Err(TenistaError.StorageError("ERROR al leer el fichero ${file.absolutePath}: ${e.message}"))
+        return if (!file.exists()) {
+            Err(TenistaError.StorageError("ERROR: El fichero no existe ${file.absolutePath}"))
+        } else {
+            try {
+                // Código de lectura del fichero
+                logger.debug { "Leyendo líneas del fichero: ${file.absolutePath}" }
+                Ok(file.readLines(Charsets.UTF_8)
+                    .drop(1) // Nos saltamos la cabecera
+                    .map { line -> line.split(",") } // Separamos por ,
+                    .map { parts -> parseLine(parts) } // Parseamos la línea
+                )
+            } catch (e: Exception) {
+                logger.error(e) { "Error al leer el fichero: ${file.absolutePath}" }
+                Err(TenistaError.StorageError("ERROR al leer el fichero ${file.absolutePath}: ${e.message}"))
+            }
         }
     }
 

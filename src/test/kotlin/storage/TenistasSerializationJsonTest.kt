@@ -1,6 +1,5 @@
 package storage
 
-import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.models.Tenista
 import dev.joseluisgs.storage.TenistasStorageJson
 import kotlinx.coroutines.flow.first
@@ -28,7 +27,6 @@ class TenistasSerializationJsonTest {
         val result = tenistasSerializationJson.import(nonExistentFile).first()
         assertAll(
             { assertTrue(result.isErr) },
-            { assertTrue(result.error is TenistaError.StorageError) },
             { assertTrue(result.error.message.contains("El fichero no existe")) }
         )
     }
@@ -139,7 +137,6 @@ class TenistasSerializationJsonTest {
 
         assertAll(
             { assertTrue(result.isErr) },
-            { assertTrue(result.error is TenistaError.StorageError) },
             { assertTrue(result.error.message.contains("Error al acceder al fichero")) }
         )
     }

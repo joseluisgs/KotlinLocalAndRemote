@@ -80,7 +80,6 @@ class TenistasRepositoryRemoteTest {
 
         assertAll(
             { assertTrue(result.isErr) },
-            { assertTrue(result.error is TenistaError.RemoteError) },
             { assertTrue(result.error.message.contains("400 Error message")) }
         )
     }
@@ -107,7 +106,6 @@ class TenistasRepositoryRemoteTest {
 
         assertAll(
             { assertTrue(result.isErr) },
-            { assertTrue(result.error is TenistaError.RemoteError) },
             { assertTrue(result.error.message.contains("404 Not Found")) }
         )
     }
@@ -178,7 +176,6 @@ class TenistasRepositoryRemoteTest {
 
         assertAll(
             { assertTrue(result.isErr) },
-            { assertTrue(result.error is TenistaError.RemoteError) },
             { assertTrue(result.error.message.contains("400 Error message")) }
         )
 
@@ -207,7 +204,6 @@ class TenistasRepositoryRemoteTest {
 
         assertAll(
             { assertTrue(result.isErr) },
-            { assertTrue(result.error is TenistaError.RemoteError) },
             { assertTrue(result.error.message.contains("400 Error message")) }
         )
 
