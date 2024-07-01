@@ -26,7 +26,4 @@ data class Tenista(
         ZURDO
     }
 
-    override fun toString(): String {
-        return "Tenista(id=$id, nombre='$nombre', pais='$pais', altura=$altura, peso=$peso, puntos=$puntos, mano=$mano, fechaNacimiento=$fechaNacimiento, createdAt=$createdAt, updatedAt=$updatedAt, isDeleted=$isDeleted)"
-    }
 }
