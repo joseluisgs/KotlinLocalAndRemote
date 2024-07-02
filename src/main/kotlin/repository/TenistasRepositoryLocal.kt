@@ -98,9 +98,10 @@ class TenistasRepositoryLocal(
 
     fun saveAll(tenistas: List<Tenista>): Flow<Result<Int, TenistaError>> = flow {
         logger.debug { "Guardando todos los tenistas en la bd local: ${tenistas.size}" }
+        val timeStamp = LocalDateTime.now()
         sqlClient.queries.transaction {
             tenistas.forEach {
-                sqlClient.queries.insert(it.toTenistaEntity())
+                sqlClient.queries.insert(it.copy(createdAt = timeStamp, updatedAt = timeStamp).toTenistaEntity())
             }
         }
         emit(Ok(tenistas.size))
