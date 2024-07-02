@@ -57,10 +57,10 @@ class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : Tenist
         )
     }.flowOn(Dispatchers.IO)
 
-    override fun delete(id: Long): Flow<Result<Unit, TenistaError.RemoteError>> = flow {
+    override fun delete(id: Long): Flow<Result<Long, TenistaError.RemoteError>> = flow {
         logger.debug { "Borrando tenista con id $id en la api rest" }
         restClient.delete(id).mapBoth(
-            success = { emit(Ok(Unit)) },
+            success = { emit(Ok(id)) },
             failure = { emit(Err(TenistaError.RemoteError("${it.message}, no se ha podido guardar el tenista con id $id"))) }
         )
     }.flowOn(Dispatchers.IO)

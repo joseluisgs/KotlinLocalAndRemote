@@ -356,8 +356,8 @@ class TenistasServiceImplTest {
 
         // Suponemos que esta en la cache
         every { cache.get(id) } returns testTenista
-        coEvery { localRepository.delete(id) } returns flowOf(Ok(Unit))
-        coEvery { remoteRepository.delete(id) } returns flowOf(Ok(Unit))
+        coEvery { localRepository.delete(id) } returns flowOf(Ok(id))
+        coEvery { remoteRepository.delete(id) } returns flowOf(Ok(id))
         every { cache.remove(id) } returns Unit
         coEvery { notificationsService.send(any()) } returns Unit
 
@@ -365,7 +365,7 @@ class TenistasServiceImplTest {
 
         assertAll("Debemos obtener tenista borrado",
             { assertTrue(result.isOk) },
-            { assertEquals(Unit, result.get()) }
+            { assertEquals(id, result.get()) }
         )
 
         coVerify(atLeast = 1) { localRepository.delete(id) }
@@ -381,7 +381,7 @@ class TenistasServiceImplTest {
 
         // Suponemos que esta en la cache
         every { cache.get(id) } returns testTenista
-        coEvery { localRepository.delete(id) } returns flowOf(Ok(Unit))
+        coEvery { localRepository.delete(id) } returns flowOf(Ok(id))
         coEvery { remoteRepository.delete(id) } returns flowOf((Err(TenistaError.RemoteError("Error"))))
 
         val result = service.delete(id).first()
@@ -402,7 +402,7 @@ class TenistasServiceImplTest {
 
         // Suponemos que esta en la cache
         every { cache.get(id) } returns testTenista
-        coEvery { remoteRepository.delete(id) } returns flowOf(Ok(Unit))
+        coEvery { remoteRepository.delete(id) } returns flowOf(Ok(id))
         coEvery { localRepository.delete(id) } returns flowOf((Err(TenistaError.NotFound(id))))
 
         val result = service.delete(id).first()

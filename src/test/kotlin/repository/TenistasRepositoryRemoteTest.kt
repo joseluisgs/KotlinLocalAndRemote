@@ -186,7 +186,7 @@ class TenistasRepositoryRemoteTest {
 
         assertAll(
             { assertTrue(result.isOk) },
-            { assertEquals(Unit, result.value) }
+            { assertEquals(result.value, 1L) }
         )
 
         coVerify(atLeast = 1) { restClient.delete(1L) }

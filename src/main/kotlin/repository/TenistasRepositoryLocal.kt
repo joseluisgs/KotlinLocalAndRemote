@@ -79,12 +79,12 @@ class TenistasRepositoryLocal(
 
     }.flowOn(Dispatchers.IO)
 
-    override fun delete(id: Long): Flow<Result<Unit, TenistaError>> = flow {
-        logger.debug { "Borrando lógico tenista por id: $id en la bd" }
+    override fun delete(id: Long): Flow<Result<Long, TenistaError>> = flow {
+        logger.debug { "Borrando físico tenista por id: $id en la bd" }
         emit(getById(id).first().mapBoth(
             success = {
                 sqlClient.queries.delete(id)
-                Ok(Unit)
+                Ok(id)
             },
             failure = { error -> Err(error) }
         ))

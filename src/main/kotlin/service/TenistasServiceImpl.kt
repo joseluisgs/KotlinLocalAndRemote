@@ -156,7 +156,7 @@ class TenistasServiceImpl(
             )
     }.flowOn(Dispatchers.IO)
 
-    override fun delete(id: Long): Flow<Result<Unit, TenistaError>> = flow {
+    override fun delete(id: Long): Flow<Result<Long, TenistaError>> = flow {
         logger.debug { "Borrando tenista por id: $id" }
 
         getById(id).first()
@@ -171,7 +171,7 @@ class TenistasServiceImpl(
                         )
                     )
                     cache.remove(id)
-                    emit(Ok(Unit))
+                    emit(Ok(id))
                 },
                 failure = { emit(Err(it)) }
             )

@@ -8,5 +8,5 @@ interface Respository<ID, T, E> {
     fun getById(id: ID): Flow<Result<T, E>>
     fun save(t: T): Flow<Result<T, E>>
     fun update(id: ID, t: T): Flow<Result<T, E>>
-    fun delete(id: ID): Flow<Result<Unit, E>>
+    fun delete(id: ID): Flow<Result<ID, E>>
 }
