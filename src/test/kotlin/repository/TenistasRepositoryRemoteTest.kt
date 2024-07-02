@@ -112,11 +112,7 @@ class TenistasRepositoryRemoteTest {
 
     @Test
     fun `save debe salvar un tenista`() = runTest {
-        coEvery {
-            restClient.save(
-                testTenista.copy(Tenista.NEW_ID).toTenistaDto()
-            )
-        } returns Ok(testTenista.toTenistaDto())
+        coEvery { restClient.save(any()) } returns Ok(testTenista.toTenistaDto())
 
         val result = repository.save(testTenista).first()
 
@@ -125,13 +121,13 @@ class TenistasRepositoryRemoteTest {
             { assertEquals(testTenista, result.value) }
         )
 
-        coVerify(atLeast = 1) { restClient.save(testTenista.copy(Tenista.NEW_ID).toTenistaDto()) }
+        coVerify(atLeast = 1) { restClient.save(any()) }
     }
 
     @Test
     fun `save debe devolver error si falla`() = runTest {
 
-        coEvery { restClient.save(testTenista.copy(Tenista.NEW_ID).toTenistaDto()) } returns Err(
+        coEvery { restClient.save(any()) } returns Err(
             TenistaError.ApiError(
                 400,
                 "Error message"
@@ -145,13 +141,13 @@ class TenistasRepositoryRemoteTest {
             { assertTrue(result.error.message.contains("400 Error message")) }
         )
 
-        coVerify(atLeast = 1) { restClient.save(testTenista.copy(Tenista.NEW_ID).toTenistaDto()) }
+        coVerify(atLeast = 1) { restClient.save(any()) }
 
     }
 
     @Test
     fun `update debe actualizar un tenista`() = runTest {
-        coEvery { restClient.update(1L, testTenista.toTenistaDto()) } returns Ok(testTenista.toTenistaDto())
+        coEvery { restClient.update(1L, any()) } returns Ok(testTenista.toTenistaDto())
 
         val result = repository.update(1L, testTenista).first()
 
@@ -160,7 +156,7 @@ class TenistasRepositoryRemoteTest {
             { assertEquals(testTenista, result.value) }
         )
 
-        coVerify(atLeast = 1) { restClient.update(1L, testTenista.toTenistaDto()) }
+        coVerify(atLeast = 1) { restClient.update(1L, any()) }
     }
 
     @Test
@@ -168,7 +164,7 @@ class TenistasRepositoryRemoteTest {
         coEvery {
             restClient.update(
                 1L,
-                testTenista.toTenistaDto()
+                any()
             )
         } returns Err(TenistaError.ApiError(400, "Error message"))
 
@@ -179,7 +175,7 @@ class TenistasRepositoryRemoteTest {
             { assertTrue(result.error.message.contains("400 Error message")) }
         )
 
-        coVerify(atLeast = 1) { restClient.update(1L, testTenista.toTenistaDto()) }
+        coVerify(atLeast = 1) { restClient.update(1L, any()) }
     }
 
     @Test

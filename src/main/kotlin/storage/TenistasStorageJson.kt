@@ -29,20 +29,20 @@ class TenistasStorageJson : TenistasStorage {
 
     private fun readLines(file: File): Result<List<Tenista>, TenistaError.StorageError> {
         // Creamos el serializador de JSON
-        return if (!file.exists()) {
-            Err(TenistaError.StorageError("El fichero no existe ${file.absolutePath}"))
-        } else {
-
-            try {
-                val json = Json { ignoreUnknownKeys = true; encodeDefaults = false; isLenient = true }
-                // Leemos el fichero y lo convertimos a Tenista
-                val tenistas = json.decodeFromString<List<TenistaDto>>(file.readText()).map { it.toTenista() }
-                Ok(tenistas) // Devolvemos los tenistas
-            } catch (e: Exception) {
-                logger.error(e) { "Error al leer el fichero: ${file.absolutePath}" }
-                Err(TenistaError.StorageError("ERROR al leer el fichero ${file.absolutePath}: ${e.message}"))
-            }
+        if (!file.exists()) {
+            return Err(TenistaError.StorageError("El fichero no existe ${file.absolutePath}"))
         }
+
+        return try {
+            val json = Json { ignoreUnknownKeys = true; encodeDefaults = false; isLenient = true }
+            // Leemos el fichero y lo convertimos a Tenista
+            val tenistas = json.decodeFromString<List<TenistaDto>>(file.readText()).map { it.toTenista() }
+            Ok(tenistas) // Devolvemos los tenistas
+        } catch (e: Exception) {
+            logger.error(e) { "Error al leer el fichero: ${file.absolutePath}" }
+            Err(TenistaError.StorageError("No se puede leer el fichero ${file.absolutePath}: ${e.message}"))
+        }
+
     }
 
 

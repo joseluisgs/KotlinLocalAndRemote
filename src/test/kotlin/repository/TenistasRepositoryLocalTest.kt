@@ -122,7 +122,7 @@ class TenistasRepositoryLocalTest {
         }
 
         coEvery {
-            databaseQueries.insert(testTenista.toTenistaEntity())
+            databaseQueries.insert(any())
         } returns Unit
 
         coEvery {
@@ -133,12 +133,7 @@ class TenistasRepositoryLocalTest {
 
         assertAll(
             { assertTrue(result.isOk) },
-            {
-                assertEquals(
-                    testTenista.copy(createdAt = result.value.createdAt, updatedAt = result.value.updatedAt),
-                    result.value
-                )
-            }
+            { assertEquals(testTenista, result.value) }
         )
 
         coVerify(atLeast = 1) {

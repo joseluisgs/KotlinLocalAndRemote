@@ -50,22 +50,22 @@ class TenistasStorageCsv : TenistasStorage {
 
 
     private fun readLines(file: File): Result<List<Tenista>, TenistaError.StorageError> {
-        return if (!file.exists()) {
-            Err(TenistaError.StorageError("ERROR: El fichero no existe ${file.absolutePath}"))
-        } else {
-            try {
-                // Código de lectura del fichero
-                logger.debug { "Leyendo líneas del fichero: ${file.absolutePath}" }
-                Ok(file.readLines(Charsets.UTF_8)
-                    .drop(1) // Nos saltamos la cabecera
-                    .map { line -> line.split(",") } // Separamos por ,
-                    .map { parts -> parseLine(parts) } // Parseamos la línea
-                )
-            } catch (e: Exception) {
-                logger.error(e) { "Error al leer el fichero: ${file.absolutePath}" }
-                Err(TenistaError.StorageError("ERROR al leer el fichero ${file.absolutePath}: ${e.message}"))
-            }
+        if (!file.exists()) {
+            return Err(TenistaError.StorageError("ERROR: El fichero no existe ${file.absolutePath}"))
         }
+        return try {
+            // Código de lectura del fichero
+            logger.debug { "Leyendo líneas del fichero: ${file.absolutePath}" }
+            Ok(file.readLines(Charsets.UTF_8)
+                .drop(1) // Nos saltamos la cabecera
+                .map { line -> line.split(",") } // Separamos por ,
+                .map { parts -> parseLine(parts) } // Parseamos la línea
+            )
+        } catch (e: Exception) {
+            logger.error(e) { "Error al leer el fichero: ${file.absolutePath}" }
+            Err(TenistaError.StorageError("ERROR al leer el fichero ${file.absolutePath}: ${e.message}"))
+        }
+
     }
 
     private fun parseLine(parts: List<String>): Tenista {

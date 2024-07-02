@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import org.lighthousegames.logging.logging
+import java.time.LocalDateTime
 
 private val logger = logging()
 
@@ -39,15 +40,18 @@ class TenistasRepositoryRemote(private val restClient: TenistasApiRest) : Tenist
 
     override fun save(t: Tenista): Flow<Result<Tenista, TenistaError.RemoteError>> = flow {
         logger.debug { "Guardando tenista en la api rest" }
-        restClient.save(t.copy(id = Tenista.NEW_ID).toTenistaDto()).mapBoth(
-            success = { emit(Ok(it.toTenista())) },
-            failure = { emit(Err(TenistaError.RemoteError("${it.message}, no se ha podido guardar el tenista $t"))) }
-        )
+        val timeStamp = LocalDateTime.now()
+        restClient.save(t.copy(id = Tenista.NEW_ID, createdAt = timeStamp, updatedAt = timeStamp).toTenistaDto())
+            .mapBoth(
+                success = { emit(Ok(it.toTenista())) },
+                failure = { emit(Err(TenistaError.RemoteError("${it.message}, no se ha podido guardar el tenista $t"))) }
+            )
     }.flowOn(Dispatchers.IO)
 
     override fun update(id: Long, t: Tenista): Flow<Result<Tenista, TenistaError.RemoteError>> = flow {
         logger.debug { "Actualizando tenista con id $id en la api rest" }
-        restClient.update(id, t.toTenistaDto()).mapBoth(
+        val timeStamp = LocalDateTime.now()
+        restClient.update(id, t.copy(updatedAt = timeStamp).toTenistaDto()).mapBoth(
             success = { emit(Ok(it.toTenista())) },
             failure = { emit(Err(TenistaError.RemoteError("${it.message}, no se ha podido actualizar el tenista con id $id"))) }
         )

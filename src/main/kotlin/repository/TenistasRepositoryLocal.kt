@@ -31,7 +31,7 @@ class TenistasRepositoryLocal(
 
 
     override fun getAll(): Flow<Result<List<Tenista>, TenistaError>> = flow {
-        logger.debug { "Obteniendo todos los tenistas ordenados por puntos de la bd" }
+        logger.debug { "Obteniendo todos los tenistas de la bd" }
         emit(Ok(sqlClient.queries.selectAll().executeAsList().map { it.toTenista() }))
     }.flowOn(Dispatchers.IO)
 
@@ -44,11 +44,11 @@ class TenistasRepositoryLocal(
 
     override fun save(t: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
         logger.debug { "Guardando tenista: $t en la bd" }
-        val timeSpam = LocalDateTime.now()
+        val timeStamp = LocalDateTime.now()
         // Hacemos una transacción para poder obtener el id del tenista guardado
         sqlClient.queries.transaction {
             sqlClient.queries.insert(
-                t.copy(createdAt = timeSpam, updatedAt = timeSpam, id = Tenista.NEW_ID).toTenistaEntity()
+                t.copy(createdAt = timeStamp, updatedAt = timeStamp, id = Tenista.NEW_ID).toTenistaEntity()
             )
         }
         // Consultamos el tenista guardado (segun la implementación de SQLDelight usamos transactions)
@@ -58,7 +58,7 @@ class TenistasRepositoryLocal(
 
     override fun update(id: Long, t: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
         logger.debug { "Actualizando tenista por id: $id en la bd" }
-        val timestamp = LocalDateTime.now()
+        val timeStamp = LocalDateTime.now()
         emit(getById(id).first().mapBoth(
             success = { tenista ->
                 sqlClient.queries.update(
@@ -70,9 +70,9 @@ class TenistasRepositoryLocal(
                     puntos = t.puntos.toLong(),
                     mano = t.mano.name,
                     fecha_nacimiento = t.fechaNacimiento.toString(),
-                    updated_at = timestamp.toString()
+                    updated_at = timeStamp.toString()
                 )
-                Ok(t.copy(createdAt = tenista.createdAt, updatedAt = timestamp))
+                Ok(t.copy(createdAt = tenista.createdAt, updatedAt = timeStamp))
             },
             failure = { error -> Err(error) }
         ))

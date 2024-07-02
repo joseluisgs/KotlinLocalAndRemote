@@ -27,7 +27,7 @@ class CacheGenericTest {
     }
 
     @Test
-    fun `debe devolver unm elemento existente en la cache en base a su clave`() {
+    fun `debe devolver un elemento existente en la cache en base a su clave`() {
         val cache = CacheGeneric<Long, Tenista>(2)
         val tenista1 = createRandomTenista()
 
