@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -14,24 +15,32 @@ import java.time.LocalDate
 import kotlin.test.Test
 
 class TenistasStorageCsvTest {
-    // importamos la clase a testear
     private val tenistasStorageCsv = TenistasStorageCsv()
 
-    @TempDir // Inyectamos un directorio temporal
+    @TempDir
     lateinit var tempDir: Path
 
     @Test
+    @DisplayName("Importar debe devolver error si el fichero no existe")
     fun `import debe devolver error si el fichero no existe`(): Unit = runTest {
         val nonExistentFile = File(tempDir.toFile(), "fichero_no_existe.csv")
 
         val result = tenistasStorageCsv.import(nonExistentFile).first()
         assertAll(
-            { assertTrue(result.isErr) },
-            { assertTrue(result.error.message.contains("El fichero no existe")) }
+            {
+                assertTrue(result.isErr, "El resultado debe ser un error")
+            },
+            {
+                assertTrue(
+                    result.error.message.contains("El fichero no existe"),
+                    "El mensaje debe indicar que el fichero no existe"
+                )
+            }
         )
     }
 
     @Test
+    @DisplayName("Importar debe devolver una lista si el fichero existe")
     fun `import debe devolver una lista si el fichero existe`() = runTest {
         val validFile = File(tempDir.toFile(), "tenistas.csv").apply {
             writeText(
@@ -46,14 +55,23 @@ class TenistasStorageCsvTest {
         val result = tenistasStorageCsv.import(validFile).first()
 
         assertAll(
-            { assertTrue(result.isOk) },
-            { assertEquals(2, result.value.size) },
-            { assertEquals("Novak Djokovic", result.value[0].nombre) },
-            { assertEquals("Daniil Medvedev", result.value[1].nombre) }
+            {
+                assertTrue(result.isOk, "El resultado debe ser una lista correcta")
+            },
+            {
+                assertEquals(2, result.value.size, "El tamaño de la lista debe ser 2")
+            },
+            {
+                assertEquals("Novak Djokovic", result.value[0].nombre, "El primer tenista debe ser Novak Djokovic")
+            },
+            {
+                assertEquals("Daniil Medvedev", result.value[1].nombre, "El segundo tenista debe ser Daniil Medvedev")
+            }
         )
     }
 
     @Test
+    @DisplayName("Exportar debe escribir tenistas en un fichero")
     fun `export debe escribir tenistas en un fichero`() = runTest {
         val file = File(tempDir.toFile(), "tenistas_export.csv")
         val tenistas = listOf(
@@ -82,19 +100,30 @@ class TenistasStorageCsvTest {
         val result = tenistasStorageCsv.export(file, tenistas).first()
 
         assertAll(
-            { assertTrue(result.isOk) },
-            { assertEquals(2, result.value) },
-            { assertTrue(file.exists()) },
+            {
+                assertTrue(result.isOk, "El resultado debe ser exitoso")
+            },
+            {
+                assertEquals(2, result.value, "El número de tenistas exportados debe ser 2")
+            },
+            {
+                assertTrue(file.exists(), "El fichero debe existir")
+            },
         )
 
         val content = file.readText()
         assertAll(
-            { assertTrue(content.contains("Rafael Nadal")) },
-            { assertTrue(content.contains("Roger Federer")) }
+            {
+                assertTrue(content.contains("Rafael Nadal"), "El contenido debe contener a Rafael Nadal")
+            },
+            {
+                assertTrue(content.contains("Roger Federer"), "El contenido debe contener a Roger Federer")
+            }
         )
     }
 
     @Test
+    @DisplayName("Exportar debe devolver error si no existe")
     fun `export debe devolver error si no existe fichero`() = runTest {
         val invalidFile = File("/invalid/path/tenistas_export.csv")
         val tenistas = listOf(
@@ -113,9 +142,15 @@ class TenistasStorageCsvTest {
         val result = tenistasStorageCsv.export(invalidFile, tenistas).first()
 
         assertAll(
-            { assertTrue(result.isErr) },
-            { assertTrue(result.error.message.contains("Error al acceder al fichero")) }
+            {
+                assertTrue(result.isErr, "El resultado debe ser un error")
+            },
+            {
+                assertTrue(
+                    result.error.message.contains("Error al acceder al fichero"),
+                    "El mensaje debe indicar error al acceder al fichero"
+                )
+            }
         )
     }
-
 }

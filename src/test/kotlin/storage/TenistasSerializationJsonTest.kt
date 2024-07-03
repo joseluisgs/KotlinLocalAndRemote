@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -21,17 +22,24 @@ class TenistasSerializationJsonTest {
     lateinit var tempDir: Path
 
     @Test
+    @DisplayName("Importar debe devolver error si el fichero no existe")
     fun `import debe devolver error si el fichero no existe`(): Unit = runTest {
         val nonExistentFile = File(tempDir.toFile(), "fichero_no_existe.csv")
 
         val result = tenistasSerializationJson.import(nonExistentFile).first()
         assertAll(
-            { assertTrue(result.isErr) },
-            { assertTrue(result.error.message.contains("El fichero no existe")) }
+            { assertTrue(result.isErr, "El resultado debería ser un error") },
+            {
+                assertTrue(
+                    result.error.message.contains("El fichero no existe"),
+                    "El mensaje de error debería indicar que el fichero no existe"
+                )
+            }
         )
     }
 
     @Test
+    @DisplayName("Importar debe devolver una lista si el fichero existe")
     fun `import debe devolver una lista si el fichero existe`() = runTest {
         val validFile = File(tempDir.toFile(), "tenistas.json").apply {
             writeText(
@@ -69,14 +77,27 @@ class TenistasSerializationJsonTest {
         val result = tenistasSerializationJson.import(validFile).first()
 
         assertAll(
-            { assertTrue(result.isOk) },
-            { assertEquals(2, result.value.size) },
-            { assertEquals("Novak Djokovic", result.value[0].nombre) },
-            { assertEquals("Daniil Medvedev", result.value[1].nombre) }
+            { assertTrue(result.isOk, "El resultado debería ser exitoso") },
+            { assertEquals(2, result.value.size, "El tamaño de la lista debería ser 2") },
+            {
+                assertEquals(
+                    "Novak Djokovic",
+                    result.value[0].nombre,
+                    "El nombre del primer tenista debería ser 'Novak Djokovic'"
+                )
+            },
+            {
+                assertEquals(
+                    "Daniil Medvedev",
+                    result.value[1].nombre,
+                    "El nombre del segundo tenista debería ser 'Daniil Medvedev'"
+                )
+            }
         )
     }
 
     @Test
+    @DisplayName("Exportar debe escribir tenistas en un fichero")
     fun `export debe escribir tenistas en un fichero`() = runTest {
         val file = File(tempDir.toFile(), "tenistas_export.json")
         val tenistas = listOf(
@@ -105,19 +126,20 @@ class TenistasSerializationJsonTest {
         val result = tenistasSerializationJson.export(file, tenistas).first()
 
         assertAll(
-            { assertTrue(result.isOk) },
-            { assertEquals(2, result.value) },
-            { assertTrue(file.exists()) },
+            { assertTrue(result.isOk, "El resultado debería ser exitoso") },
+            { assertEquals(2, result.value, "El valor del resultado debería ser 2") },
+            { assertTrue(file.exists(), "El fichero debería existir") },
         )
 
         val content = file.readText()
         assertAll(
-            { assertTrue(content.contains("Rafael Nadal")) },
-            { assertTrue(content.contains("Roger Federer")) }
+            { assertTrue(content.contains("Rafael Nadal"), "El contenido debería contener 'Rafael Nadal'") },
+            { assertTrue(content.contains("Roger Federer"), "El contenido debería contener 'Roger Federer'") }
         )
     }
 
     @Test
+    @DisplayName("Exportar debe devolver error si no existe fichero")
     fun `export debe devolver error si no existe fichero`() = runTest {
         val invalidFile = File("/invalid/path/tenistas_export.json")
         val tenistas = listOf(
@@ -136,9 +158,13 @@ class TenistasSerializationJsonTest {
         val result = tenistasSerializationJson.export(invalidFile, tenistas).first()
 
         assertAll(
-            { assertTrue(result.isErr) },
-            { assertTrue(result.error.message.contains("Error al acceder al fichero")) }
+            { assertTrue(result.isErr, "El resultado debería ser un error") },
+            {
+                assertTrue(
+                    result.error.message.contains("Error al acceder al fichero"),
+                    "El mensaje de error debería indicar un problema al acceder al fichero"
+                )
+            }
         )
     }
-
 }

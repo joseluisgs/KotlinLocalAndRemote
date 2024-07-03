@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.assertAll
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -15,6 +16,7 @@ import kotlin.test.Test
 
 class TenistasNotificationsTest {
     @Test
+    @DisplayName("Notificación es emitida")
     fun `notificacion es emitida`() = runTest {
         // Arrange
         val testTenista = Tenista(
@@ -41,10 +43,22 @@ class TenistasNotificationsTest {
         val emittedNotification = tenistasNotifications.notifications.distinctUntilChanged().first()
 
         assertAll(
-            { assertEquals(notification, emittedNotification) },
-            { assertEquals(notification.type, emittedNotification.type) },
-            { assertEquals(notification.item, emittedNotification.item) },
-            { assertEquals(notification.createdAt, emittedNotification.createdAt) }
+            { assertEquals(notification, emittedNotification, "La notificación debe ser la misma") },
+            { assertEquals(notification.type, emittedNotification.type, "El tipo de notificación debe ser el mismo") },
+            {
+                assertEquals(
+                    notification.item,
+                    emittedNotification.item,
+                    "El ítem de la notificación debe ser el mismo"
+                )
+            },
+            {
+                assertEquals(
+                    notification.createdAt,
+                    emittedNotification.createdAt,
+                    "La fecha de creación debe ser la misma"
+                )
+            }
         )
     }
 }

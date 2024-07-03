@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import java.io.File
@@ -84,29 +85,31 @@ class TenistasServiceImplTest {
 
 
     @Test
+    @DisplayName("Obtener todos los tenistas localmente debe retornar lista de tenistas")
     fun `getAll debe retornar lista de tenistas localmente`() = runTest {
         coEvery { localRepository.getAll() } returns flowOf(Ok(listOf(testTenista)))
 
         val result = service.getAll(false).first()
 
         assertAll("Debemos obtener lista de tenistas",
-            { assertTrue(result.isOk) },
-            { assertEquals(listOf(testTenista), result.value) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(listOf(testTenista), result.value, "La lista de tenistas debe ser la esperada") }
         )
 
         coVerify(atLeast = 1) { localRepository.getAll() }
     }
 
     @Test
-    fun `getAll debe retornar lista de tenistas remota`() = runTest {
+    @DisplayName("Obtener todos los tenistas remotamente debe retornar lista de tenistas")
+    fun `getAll lista de tenistas remota`() = runTest {
         coEvery { remoteRepository.getAll() } returns flowOf(Ok(listOf(testTenista)))
         coEvery { localRepository.saveAll(any()) } returns flowOf(Ok(1))
         coEvery { localRepository.removeAll() } returns flowOf(Ok(Unit))
         val result = service.getAll(true).first()
 
         assertAll("Debemos obtener lista de tenistas",
-            { assertTrue(result.isOk) },
-            { assertEquals(listOf(testTenista), result.value) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(listOf(testTenista), result.value, "La lista de tenistas debe ser la esperada") }
         )
 
         coVerify(atLeast = 1) { remoteRepository.getAll() }
@@ -115,6 +118,7 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Obtener tenista por ID debe retornar tenista en cache")
     fun `getById debe retornar tenista en cache`() = runTest {
         val id = testTenista.id
         every { cache.get(id) } returns testTenista
@@ -122,14 +126,15 @@ class TenistasServiceImplTest {
         val result = service.getById(id).first()
 
         assertAll("Debemos obtener tenista",
-            { assertTrue(result.isOk) },
-            { assertEquals(testTenista, result.get()) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(testTenista, result.get(), "El tenista debe ser el esperado") }
         )
 
         verify(atLeast = 1) { cache.get(id) }
     }
 
     @Test
+    @DisplayName("Obtener tenista por ID debe retornar tenista local si no está en cache")
     fun `getById debe retornar tenista local si no esta en cache`() = runTest {
         val id = testTenista.id
         every { cache.get(id) } returns null
@@ -139,8 +144,8 @@ class TenistasServiceImplTest {
         val result = service.getById(id).first()
 
         assertAll("Debemos obtener tenista",
-            { assertTrue(result.isOk) },
-            { assertEquals(testTenista, result.get()) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(testTenista, result.get(), "El tenista debe ser el esperado") }
         )
 
         verify(atLeast = 1) { cache.get(id) }
@@ -149,6 +154,7 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Obtener tenista por ID debe retornar tenista remoto si no está en cache ni local")
     fun `getById debe retornar tenista remoto si no esta en cache ni local`() = runTest {
         val id = testTenista.id
         every { cache.get(id) } returns null
@@ -160,8 +166,8 @@ class TenistasServiceImplTest {
         val result = service.getById(id).first()
 
         assertAll("Debemos obtener tenista",
-            { assertTrue(result.isOk) },
-            { assertEquals(testTenista, result.get()) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(testTenista, result.get(), "El tenista debe ser el esperado") }
         )
 
         verify(atLeast = 1) { cache.get(id) }
@@ -172,6 +178,7 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Obtener tenista por ID debe retornar error si no está en cache, local ni remoto")
     fun `getById debe retornar error si no esta en cache ni local ni remoto`() = runTest {
         val id = testTenista.id
         every { cache.get(id) } returns null
@@ -181,8 +188,14 @@ class TenistasServiceImplTest {
         val result = service.getById(id).first()
 
         assertAll("Debemos obtener error",
-            { assertTrue(result.isErr) },
-            { assertEquals(TenistaError.RemoteError("Error").message, result.error.message) }
+            { assertTrue(result.isErr, "El resultado debe ser un error") },
+            {
+                assertEquals(
+                    TenistaError.RemoteError("Error").message,
+                    result.error.message,
+                    "El mensaje de error debe ser el esperado"
+                )
+            }
         )
 
         verify(atLeast = 1) { cache.get(id) }
@@ -190,8 +203,8 @@ class TenistasServiceImplTest {
         coVerify(atLeast = 1) { remoteRepository.getById(id) }
     }
 
-    // Save
     @Test
+    @DisplayName("Guardar tenista debe retornar tenista guardado")
     fun `save debe retornar tenista guardado`() = runTest {
         val newTenista = testTenista.copy(id = Tenista.NEW_ID, nombre = "Test New", puntos = 10)
 
@@ -203,8 +216,8 @@ class TenistasServiceImplTest {
         val result = service.save(newTenista).first()
 
         assertAll("Debemos obtener tenista guardado",
-            { assertTrue(result.isOk) },
-            { assertEquals(newTenista, result.get()) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(newTenista, result.get(), "El tenista guardado debe ser el esperado") }
         )
 
         coVerify(atLeast = 1) { localRepository.save(newTenista) }
@@ -214,18 +227,19 @@ class TenistasServiceImplTest {
     }
 
     @Test
-    fun `save debe retornar error si no se puede guardar por validación`() = runTest {
+    @DisplayName("Guardar tenista debe retornar error si no se puede guardar por validación")
+    fun `save debe retornar error si no se puede guardar por validacion`() = runTest {
         val newTenista = testTenista.copy(id = Tenista.NEW_ID, nombre = "Test New", puntos = -10)
-
 
         val result = service.save(newTenista).first()
 
         assertAll("Debemos obtener error",
-            { assertTrue(result.isErr) },
+            { assertTrue(result.isErr, "El resultado debe ser un error") },
             {
                 assertEquals(
                     TenistaError.ValidationError("Los puntos no pueden ser negativos").message,
-                    result.error.message
+                    result.error.message,
+                    "El mensaje de error debe ser el esperado"
                 )
             }
         )
@@ -235,6 +249,7 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Guardar tenista debe retornar error si no se puede guardar remotamente")
     fun `save debe retornar error si no se puede guardar remotamente`() = runTest {
         val newTenista = testTenista.copy(id = Tenista.NEW_ID, nombre = "Test New", puntos = 10)
 
@@ -243,20 +258,26 @@ class TenistasServiceImplTest {
         val result = service.save(newTenista).first()
 
         assertAll("Debemos obtener error",
-            { assertTrue(result.isErr) },
-            { assertEquals(TenistaError.RemoteError("Error").message, result.error.message) }
+            { assertTrue(result.isErr, "El resultado debe ser un error") },
+            {
+                assertEquals(
+                    TenistaError.RemoteError("Error").message,
+                    result.error.message,
+                    "El mensaje de error debe ser el esperado"
+                )
+            }
         )
 
         coVerify(atLeast = 0) { localRepository.save(newTenista) }
         coVerify(atLeast = 1) { remoteRepository.save(newTenista) }
     }
 
-    // update
     @Test
+    @DisplayName("Actualizar tenista debe retornar tenista actualizado")
     fun `update debe retornar tenista actualizado`() = runTest {
         val updatedTenista = testTenista.copy(nombre = "Test Update", puntos = 20)
 
-        // Suponemos que esta en la cache
+        // Suponemos que está en la cache
         every { cache.get(updatedTenista.id) } returns updatedTenista
         coEvery { localRepository.update(updatedTenista.id, updatedTenista) } returns flowOf(Ok(updatedTenista))
         coEvery { remoteRepository.update(updatedTenista.id, updatedTenista) } returns flowOf(Ok(updatedTenista))
@@ -266,8 +287,8 @@ class TenistasServiceImplTest {
         val result = service.update(updatedTenista.id, updatedTenista).first()
 
         assertAll("Debemos obtener tenista actualizado",
-            { assertTrue(result.isOk) },
-            { assertEquals(updatedTenista, result.get()) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(updatedTenista, result.get(), "El tenista actualizado debe ser el esperado") }
         )
 
         coVerify(atLeast = 1) { localRepository.update(updatedTenista.id, updatedTenista) }
@@ -278,20 +299,22 @@ class TenistasServiceImplTest {
     }
 
     @Test
-    fun `update debe retornar error si no se puede actualizar por validación`() = runTest {
+    @DisplayName("Actualizar tenista debe retornar error si no se puede actualizar por validación")
+    fun `update debe retornar error si no se puede actualizar por validacion`() = runTest {
         val updatedTenista = testTenista.copy(nombre = "Test Update", puntos = -20)
 
-        // Suponemos que esta en la cache
+        // Suponemos que está en la cache
         every { cache.get(updatedTenista.id) } returns updatedTenista
 
         val result = service.update(updatedTenista.id, updatedTenista).first()
 
         assertAll("Debemos obtener error",
-            { assertTrue(result.isErr) },
+            { assertTrue(result.isErr, "El resultado debe ser un error") },
             {
                 assertEquals(
                     TenistaError.ValidationError("Los puntos no pueden ser negativos").message,
-                    result.error.message
+                    result.error.message,
+                    "El mensaje de error debe ser el esperado"
                 )
             }
         )
@@ -302,10 +325,11 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Actualizar tenista debe retornar error si no se puede actualizar remotamente")
     fun `update debe retornar error si no se puede actualizar remotamente`() = runTest {
         val updatedTenista = testTenista.copy(nombre = "Test Update", puntos = 20)
 
-        // Suponemos que esta en la cache
+        // Suponemos que está en la cache
         every { cache.get(updatedTenista.id) } returns updatedTenista
         coEvery {
             remoteRepository.update(
@@ -317,8 +341,14 @@ class TenistasServiceImplTest {
         val result = service.update(updatedTenista.id, updatedTenista).first()
 
         assertAll("Debemos obtener error",
-            { assertTrue(result.isErr) },
-            { assertEquals(TenistaError.RemoteError("Error").message, result.error.message) }
+            { assertTrue(result.isErr, "El resultado debe ser un error") },
+            {
+                assertEquals(
+                    TenistaError.RemoteError("Error").message,
+                    result.error.message,
+                    "El mensaje de error debe ser el esperado"
+                )
+            }
         )
 
         coVerify(atLeast = 0) { localRepository.update(updatedTenista.id, updatedTenista) }
@@ -327,10 +357,11 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Actualizar tenista debe retornar error porque el tenista no existe remotamente")
     fun `update debe retornar error porque el tenista no existe remotamente`() = runTest {
         val updatedTenista = testTenista.copy(nombre = "Test Update", puntos = 20)
 
-        // Suponemos que esta en la cache y local
+        // Suponemos que está en la cache y local
         every { cache.get(updatedTenista.id) } returns null
         coEvery { localRepository.getById(updatedTenista.id) } returns flowOf(Err(TenistaError.NotFound(updatedTenista.id)))
         coEvery { remoteRepository.getById(updatedTenista.id) } returns flowOf(Err(TenistaError.RemoteError("Error")))
@@ -338,23 +369,27 @@ class TenistasServiceImplTest {
         val result = service.update(updatedTenista.id, updatedTenista).first()
 
         assertAll("Debemos obtener error",
-            { assertTrue(result.isErr) },
-            { assertEquals(TenistaError.RemoteError("Error").message, result.error.message) }
+            { assertTrue(result.isErr, "El resultado debe ser un error") },
+            {
+                assertEquals(
+                    TenistaError.RemoteError("Error").message,
+                    result.error.message,
+                    "El mensaje de error debe ser el esperado"
+                )
+            }
         )
 
         coVerify(atLeast = 0) { localRepository.update(updatedTenista.id, updatedTenista) }
         coVerify(atLeast = 0) { remoteRepository.update(updatedTenista.id, updatedTenista) }
         verify(atLeast = 0) { cache.get(updatedTenista.id) }
-
     }
 
-    // delete
-
     @Test
+    @DisplayName("Borrar tenista debe retornar tenista borrado")
     fun `delete debe retornar tenista borrado`() = runTest {
         val id = testTenista.id
 
-        // Suponemos que esta en la cache
+        // Suponemos que está en la cache
         every { cache.get(id) } returns testTenista
         coEvery { localRepository.delete(id) } returns flowOf(Ok(id))
         coEvery { remoteRepository.delete(id) } returns flowOf(Ok(id))
@@ -364,8 +399,8 @@ class TenistasServiceImplTest {
         val result = service.delete(id).first()
 
         assertAll("Debemos obtener tenista borrado",
-            { assertTrue(result.isOk) },
-            { assertEquals(id, result.get()) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(id, result.get(), "El ID del tenista borrado debe ser el esperado") }
         )
 
         coVerify(atLeast = 1) { localRepository.delete(id) }
@@ -376,19 +411,26 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Borrar tenista debe retornar error si no se puede borrar remotamente")
     fun `delete debe retornar error si no se puede borrar remotamente`() = runTest {
         val id = testTenista.id
 
-        // Suponemos que esta en la cache
+        // Suponemos que está en la cache
         every { cache.get(id) } returns testTenista
         coEvery { localRepository.delete(id) } returns flowOf(Ok(id))
-        coEvery { remoteRepository.delete(id) } returns flowOf((Err(TenistaError.RemoteError("Error"))))
+        coEvery { remoteRepository.delete(id) } returns flowOf(Err(TenistaError.RemoteError("Error")))
 
         val result = service.delete(id).first()
 
         assertAll("Debemos obtener error",
-            { assertTrue(result.isErr) },
-            { assertEquals(TenistaError.RemoteError("Error").message, result.error.message) }
+            { assertTrue(result.isErr, "El resultado debe ser un error") },
+            {
+                assertEquals(
+                    TenistaError.RemoteError("Error").message,
+                    result.error.message,
+                    "El mensaje de error debe ser el esperado"
+                )
+            }
         )
 
         coVerify(atLeast = 1) { localRepository.delete(id) }
@@ -397,10 +439,11 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Borrar tenista debe retornar error si no se puede borrar localmente")
     fun `delete debe retornar error si no se puede borrar localmente`() = runTest {
         val id = testTenista.id
 
-        // Suponemos que esta en la cache
+        // Suponemos que está en la cache
         every { cache.get(id) } returns testTenista
         coEvery { remoteRepository.delete(id) } returns flowOf(Ok(id))
         coEvery { localRepository.delete(id) } returns flowOf((Err(TenistaError.NotFound(id))))
@@ -408,8 +451,14 @@ class TenistasServiceImplTest {
         val result = service.delete(id).first()
 
         assertAll("Debemos obtener error",
-            { assertTrue(result.isErr) },
-            { assertEquals(TenistaError.NotFound(id).message, result.error.message) }
+            { assertTrue(result.isErr, "El resultado debe ser un error") },
+            {
+                assertEquals(
+                    TenistaError.NotFound(id).message,
+                    result.error.message,
+                    "El mensaje de error debe ser el esperado"
+                )
+            }
         )
 
         coVerify(atLeast = 1) { localRepository.delete(id) }
@@ -417,6 +466,7 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Importar debe devolver Ok para fichero CSV")
     fun `import debe devolver Ok para fichero CSV`() = runTest {
         val file = File("test.csv")
 
@@ -428,8 +478,8 @@ class TenistasServiceImplTest {
         val result = service.import(file).first()
 
         assertAll("Debemos obtener lista de tenistas",
-            { assertTrue(result.isOk) },
-            { assertEquals(listOf(testTenista).size, result.value) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(1, result.value, "La lista de tenistas debe tener un tamaño de 1") }
         )
 
         coVerify(atLeast = 1) { csvStorage.import(file) }
@@ -438,6 +488,7 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Importar debe devolver Ok para fichero JSON")
     fun `import debe devolver Ok para fichero JSON`() = runTest {
         val file = File("test.json")
         coEvery { jsonStorage.import(file) } returns flowOf(Ok(listOf(testTenista)))
@@ -448,8 +499,8 @@ class TenistasServiceImplTest {
         val result = service.import(file).first()
 
         assertAll("Debemos obtener lista de tenistas",
-            { assertTrue(result.isOk) },
-            { assertEquals(listOf(testTenista).size, result.value) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(1, result.value, "La lista de tenistas debe tener un tamaño de 1") }
         )
 
         coVerify(atLeast = 1) { jsonStorage.import(file) }
@@ -458,23 +509,24 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Importar debe devolver error si no importar")
     fun `import debe devolver error si no se puede importar`() = runTest {
         val file = File("test.csv")
 
-        coEvery { csvStorage.import(file) } returns flowOf((Err(TenistaError.StorageError("Error"))))
+        coEvery { csvStorage.import(file) } returns flowOf(Err(TenistaError.StorageError("Error")))
 
         val result = service.import(file).first()
 
         assertAll("Debemos obtener error",
-            { assertTrue(result.isErr) },
-            { assertEquals(TenistaError.StorageError("Error").message, result.error.message) }
+            { assertTrue(result.isErr, "El resultado debe ser un error") },
+            { assertEquals("ERROR: Error", result.error.message, "El mensaje de error debe ser 'Error'") }
         )
 
         coVerify(atLeast = 1) { csvStorage.import(file) }
     }
 
-
     @Test
+    @DisplayName("Exportar debe devolver Ok para fichero CSV de manera local")
     fun `export debe devolver Ok para fichero CSV de manera local`() = runTest {
         val file = File("test.csv")
 
@@ -484,8 +536,8 @@ class TenistasServiceImplTest {
         val result = service.export(file, false).first()
 
         assertAll("Debemos obtener Ok",
-            { assertTrue(result.isOk) },
-            { assertEquals(1, result.value) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(1, result.value, "El valor del resultado debe ser 1") }
         )
 
         coVerify(atLeast = 1) { localRepository.getAll() }
@@ -493,6 +545,7 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Exportar debe devolver Ok para fichero CSV de manera remota")
     fun `export debe devolver Ok para fichero CSV de manera remota`() = runTest {
         val file = File("test.csv")
 
@@ -502,8 +555,8 @@ class TenistasServiceImplTest {
         val result = service.export(file, true).first()
 
         assertAll("Debemos obtener Ok",
-            { assertTrue(result.isOk) },
-            { assertEquals(1, result.value) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(1, result.value, "El valor del resultado debe ser 1") }
         )
 
         coVerify(atLeast = 1) { remoteRepository.getAll() }
@@ -511,6 +564,7 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Exportar debe devolver Ok para fichero Json de manera local")
     fun `export debe devolver Ok para fichero Json de manera local`() = runTest {
         val file = File("test.json")
 
@@ -520,8 +574,8 @@ class TenistasServiceImplTest {
         val result = service.export(file, false).first()
 
         assertAll("Debemos obtener Ok",
-            { assertTrue(result.isOk) },
-            { assertEquals(1, result.value) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(1, result.value, "El valor del resultado debe ser 1") }
         )
 
         coVerify(atLeast = 1) { localRepository.getAll() }
@@ -529,6 +583,7 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Exportar debe devolver Ok para fichero Json de manera remota")
     fun `export debe devolver Ok para fichero Json remota`() = runTest {
         val file = File("test.json")
 
@@ -538,8 +593,8 @@ class TenistasServiceImplTest {
         val result = service.export(file, true).first()
 
         assertAll("Debemos obtener Ok",
-            { assertTrue(result.isOk) },
-            { assertEquals(1, result.value) }
+            { assertTrue(result.isOk, "El resultado debe ser Ok") },
+            { assertEquals(1, result.value, "El valor del resultado debe ser 1") }
         )
 
         coVerify(atLeast = 1) { remoteRepository.getAll() }
@@ -547,6 +602,7 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Exportar debe devolver error si no se puede exportar")
     fun `export debe devolver error si no se puede exportar`() = runTest {
         val file = File("test.csv")
 
@@ -556,13 +612,13 @@ class TenistasServiceImplTest {
                 file,
                 listOf(testTenista)
             )
-        } returns flowOf((Err(TenistaError.StorageError("Error"))))
+        } returns flowOf(Err(TenistaError.StorageError("Error")))
 
         val result = service.export(file, false).first()
 
         assertAll("Debemos obtener error",
-            { assertTrue(result.isErr) },
-            { assertEquals(TenistaError.StorageError("Error").message, result.error.message) }
+            { assertTrue(result.isErr, "El resultado debe ser un error") },
+            { assertEquals("ERROR: Error", result.error.message, "El mensaje de error debe ser 'Error'") }
         )
 
         coVerify(atLeast = 1) { localRepository.getAll() }
@@ -570,13 +626,13 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Load data debe cargar los datos")
     fun `load data debe cargar los datos`() = runTest {
         coEvery { localRepository.removeAll() } returns flowOf(Ok(Unit))
         coEvery { remoteRepository.getAll() } returns flowOf(Ok(listOf(testTenista)))
         coEvery { localRepository.saveAll(any()) } returns flowOf(Ok(1))
         coEvery { notificationsService.send(any()) } returns Unit
         every { cache.clear() } returns Unit
-
 
         // Llamar al método que deseas probar
         service.loadData()
@@ -590,6 +646,7 @@ class TenistasServiceImplTest {
     }
 
     @Test
+    @DisplayName("Refresh debe actualizar los datos")
     fun `refresh debe actualizar los datos`() = runTest {
         // Define los comportamientos esperados de tus mocks
         coEvery { localRepository.removeAll() } returns flowOf(Ok(Unit))
@@ -603,7 +660,6 @@ class TenistasServiceImplTest {
 
         delay(1000) // Permitir que la corutina se ejecute por un tiempo específico y con ello se realicen las llamadas
 
-
         job.cancelAndJoin() // Cancelar la corutina después de la prueba
 
         // Verifica que las llamadas esperadas a los métodos se hayan realizado
@@ -613,5 +669,4 @@ class TenistasServiceImplTest {
         coVerify(atLeast = 1) { notificationsService.send(any()) }
         verify(atLeast = 1) { cache.clear() }
     }
-
 }
