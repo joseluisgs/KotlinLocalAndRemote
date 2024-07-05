@@ -80,7 +80,7 @@ class TenistasServiceImpl(
                 .andThen { localRepository.getAll().first() }.mapBoth(
                     success = { emit(Ok(it)) },
                     failure = { emit(Err(it)) }
-                )
+                ).also { cache.clear() }  // Limpiamos la cache en el caso de que sea remoto
         }
     }.flowOn(Dispatchers.IO)
 
@@ -137,7 +137,7 @@ class TenistasServiceImpl(
         logger.debug { "Actualizando tenista por id: $id" }
         // validamos
         tenista.validate()
-            .andThen { getById(id).first() }
+            .andThen { getById(id).first() } // No es porque va a fallar en remoto si no existe, es un ejemplo para concatenar cosas
             .andThen { remoteRepository.update(id, tenista).first() }
             .andThen { localRepository.update(id, tenista).first() }.mapBoth(
                 success = {
@@ -160,7 +160,9 @@ class TenistasServiceImpl(
         logger.debug { "Borrando tenista por id: $id" }
 
         getById(id).first()
-            .andThen { remoteRepository.delete(id).first() }
+            .andThen {
+                remoteRepository.delete(id).first()
+            } /// No es porque va a fallar en remoto si no existe, es un ejemplo para concatenar cosas
             .andThen { localRepository.delete(id).first() }.mapBoth(
                 success = {
                     // Enviamos la notificación de borrado
