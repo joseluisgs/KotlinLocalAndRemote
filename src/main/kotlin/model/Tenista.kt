@@ -18,7 +18,7 @@ data class Tenista(
 ) {
 
     companion object {
-        val NEW_ID = 0L
+        const val NEW_ID = 0L
     }
 
     enum class Mano {
