@@ -5,7 +5,7 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.get
 import dev.joseluisgs.cache.TenistasCache
 import dev.joseluisgs.error.TenistaError
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import dev.joseluisgs.notifications.TenistasNotifications
 import dev.joseluisgs.repository.TenistasRepositoryLocal
 import dev.joseluisgs.repository.TenistasRepositoryRemote

@@ -3,7 +3,7 @@ package dev.joseluisgs.service
 import com.github.michaelbull.result.*
 import dev.joseluisgs.cache.TenistasCache
 import dev.joseluisgs.error.TenistaError
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import dev.joseluisgs.notifications.Notification
 import dev.joseluisgs.notifications.TenistasNotifications
 import dev.joseluisgs.repository.TenistasRepositoryLocal

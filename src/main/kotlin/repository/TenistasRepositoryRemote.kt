@@ -7,7 +7,7 @@ import com.github.michaelbull.result.mapBoth
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.mapper.toTenista
 import dev.joseluisgs.mapper.toTenistaDto
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import dev.joseluisgs.rest.TenistasApiRest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

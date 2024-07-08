@@ -5,7 +5,7 @@ import dev.joseluisgs.dto.TenistaDto
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.mapper.toTenista
 import dev.joseluisgs.mapper.toTenistaDto
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -49,7 +49,7 @@ class TenistasStorageJson : TenistasStorage {
     override fun export(file: File, data: List<Tenista>): Flow<Result<Int, TenistaError.StorageError>> = flow {
         logger.debug { "Exportando Tenistas a JSON asíncrono: $file" }
         // Comprobamos que el fichero puede ser creado
-        ensureFileCanExists(file)
+        file.ensureFileCanExists()
             // En caso de error, emitimos el error
             .onFailure { error ->
                 emit(Err(error))

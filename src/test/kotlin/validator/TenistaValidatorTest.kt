@@ -2,7 +2,7 @@ package validator
 
 import com.github.michaelbull.result.Ok
 import dev.joseluisgs.error.TenistaError
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import dev.joseluisgs.validator.validate
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.assertAll

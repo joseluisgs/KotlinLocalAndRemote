@@ -1,6 +1,6 @@
 package dev.joseluisgs.cache
 
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 
 /**
  * Implementación de una cache simple para Tenistas basada en la Generica

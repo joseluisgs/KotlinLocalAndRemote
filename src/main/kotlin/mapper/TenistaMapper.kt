@@ -2,7 +2,7 @@ package dev.joseluisgs.mapper
 
 import database.TenistaEntity
 import dev.joseluisgs.dto.TenistaDto
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import java.time.LocalDate
 import java.time.LocalDateTime.now
 import java.time.LocalDateTime.parse

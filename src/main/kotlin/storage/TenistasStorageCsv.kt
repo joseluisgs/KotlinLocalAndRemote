@@ -4,7 +4,7 @@ import com.github.michaelbull.result.*
 import dev.joseluisgs.dto.TenistaDto
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.mapper.toTenista
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -30,7 +30,7 @@ class TenistasStorageCsv : TenistasStorage {
     override fun export(file: File, data: List<Tenista>): Flow<Result<Int, TenistaError.StorageError>> = flow {
         logger.debug { "Exportando Tenistas a CSV asíncrono: $file" }
 
-        ensureFileCanExists(file)
+        file.ensureFileCanExists()
             .onFailure { error ->
                 emit(Err(error))
             }

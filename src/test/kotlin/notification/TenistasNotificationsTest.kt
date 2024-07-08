@@ -1,6 +1,6 @@
 package notification
 
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import dev.joseluisgs.notifications.Notification
 import dev.joseluisgs.notifications.TenistasNotifications
 import kotlinx.coroutines.flow.distinctUntilChanged

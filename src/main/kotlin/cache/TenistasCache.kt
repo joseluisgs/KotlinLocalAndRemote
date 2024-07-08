@@ -1,6 +1,6 @@
 package dev.joseluisgs.cache
 
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 
 
 const val TENISTAS_CACHE_SIZE = 5

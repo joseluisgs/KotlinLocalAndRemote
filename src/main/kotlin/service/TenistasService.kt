@@ -2,7 +2,7 @@ package dev.joseluisgs.service
 
 import com.github.michaelbull.result.Result
 import dev.joseluisgs.error.TenistaError
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 

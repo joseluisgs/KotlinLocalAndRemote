@@ -5,7 +5,7 @@ import com.github.michaelbull.result.Ok
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.mapper.toTenista
 import dev.joseluisgs.mapper.toTenistaDto
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import dev.joseluisgs.repository.TenistasRepositoryRemote
 import dev.joseluisgs.rest.TenistasApiRest
 import io.mockk.coEvery

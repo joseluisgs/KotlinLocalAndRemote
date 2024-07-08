@@ -5,7 +5,7 @@ import database.DatabaseQueries
 import database.SqlDeLightManager
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.mapper.toTenistaEntity
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import dev.joseluisgs.repository.TenistasRepositoryLocal
 import io.mockk.Runs
 import io.mockk.coEvery

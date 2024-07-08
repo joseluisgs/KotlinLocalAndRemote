@@ -2,7 +2,7 @@ package dev.joseluisgs
 
 import com.github.michaelbull.result.mapBoth
 import dev.joseluisgs.di.appModule
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import dev.joseluisgs.notifications.Notification
 import dev.joseluisgs.service.TenistasServiceImpl
 import kotlinx.coroutines.delay
@@ -24,8 +24,6 @@ private val logger = logging()
 
 @OptIn(KoinExperimentalAPI::class)
 fun main() {
-    println("Productos Ventas con Koin")
-
     // Inicializamos Koin
     startKoin {
         // declare used logger

@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import dev.joseluisgs.error.TenistaError
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import java.time.LocalDateTime
 
 

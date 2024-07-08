@@ -8,7 +8,7 @@ import database.SqlDeLightManager
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.mapper.toTenista
 import dev.joseluisgs.mapper.toTenistaEntity
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

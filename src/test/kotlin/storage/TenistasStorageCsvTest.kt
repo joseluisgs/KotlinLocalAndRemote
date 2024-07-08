@@ -1,6 +1,6 @@
 package storage
 
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import dev.joseluisgs.storage.TenistasStorageCsv
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

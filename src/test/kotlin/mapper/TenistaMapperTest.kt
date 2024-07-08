@@ -5,7 +5,7 @@ import dev.joseluisgs.dto.TenistaDto
 import dev.joseluisgs.mapper.toTenista
 import dev.joseluisgs.mapper.toTenistaDto
 import dev.joseluisgs.mapper.toTenistaEntity
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName

@@ -1,7 +1,7 @@
 package cache
 
 import dev.joseluisgs.cache.CacheGeneric
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

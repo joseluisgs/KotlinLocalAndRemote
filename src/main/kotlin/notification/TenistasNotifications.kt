@@ -1,6 +1,6 @@
 package dev.joseluisgs.notifications
 
-import dev.joseluisgs.models.Tenista
+import dev.joseluisgs.model.Tenista
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
