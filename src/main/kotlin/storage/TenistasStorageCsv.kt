@@ -4,6 +4,7 @@ import com.github.michaelbull.result.*
 import dev.joseluisgs.dto.TenistaDto
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.mapper.toTenista
+import dev.joseluisgs.mapper.toTenistaDto
 import dev.joseluisgs.model.Tenista
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -39,11 +40,13 @@ class TenistasStorageCsv : TenistasStorage {
                 // Escribimos la cabecera
                 file.writeText("id,nombre,pais,altura,peso,puntos,mano,fechaNacimiento,createdAt,updatedAt,deletedAt,isDeleted\n")
                 // Escribimos los datos
-                data.forEach { tenista ->
-                    file.appendText(
-                        "${tenista.id},${tenista.nombre},${tenista.pais},${tenista.altura},${tenista.peso},${tenista.puntos},${tenista.mano},${tenista.fechaNacimiento},${tenista.createdAt},${tenista.updatedAt},${tenista.isDeleted}\n"
-                    )
-                }
+                data
+                    .map { it.toTenistaDto() }
+                    .forEach { tenista ->
+                        file.appendText(
+                            "${tenista.id},${tenista.nombre},${tenista.pais},${tenista.altura},${tenista.peso},${tenista.puntos},${tenista.mano},${tenista.fechaNacimiento},${tenista.createdAt},${tenista.updatedAt},${tenista.isDeleted}\n"
+                        )
+                    }
                 emit(Ok(data.size))
             }
     }.flowOn(Dispatchers.IO) // Cambiamos el contexto de ejecución a IO
@@ -59,7 +62,9 @@ class TenistasStorageCsv : TenistasStorage {
             Ok(file.readLines(Charsets.UTF_8)
                 .drop(1) // Nos saltamos la cabecera
                 .map { line -> line.split(",") } // Separamos por ,
-                .map { parts -> parseLine(parts) } // Parseamos la línea
+                // hacemos un trim para quitar espacios en blanco
+                .map { fila -> fila.map { it.trim() } }
+                .map { items -> parseLine(items) } // Parseamos la línea
             )
         } catch (e: Exception) {
             logger.error(e) { "Error al leer el fichero: ${file.absolutePath}" }
