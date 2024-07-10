@@ -220,7 +220,14 @@ Con `onBufferOverflow` indicamos qué hacer cuando el buffer de elementos está 
 DROP_OLDEST
 
 De esta manera nos aseguramos que todos los clientes solo reciban la última notificación y si noo puede procesarlas
-siempre se eliminen y solo haya una (la última)
+siempre se eliminen y solo haya una (la última).
+
+Recuerda que los `Flows` son cold streams, es decir, no se emiten valores hasta que no haya un consumidor y cuando
+hay se le emiten todos los valores emitidos.
+
+Con SharedFlow podemos tener varios consumidores que reciban los mismos valores emitidos y con ello crear un hot stream
+y limitar
+el número de elementos emitidos con `replay` y `onBufferOverflow`.
 
 Enlace a
 los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/a742db9eeec1e5dea2d2c8871efde528510f3af7).
