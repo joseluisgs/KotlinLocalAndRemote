@@ -39,7 +39,7 @@ fun main() {
 
 class App : KoinComponent {
     fun run(): Unit = runBlocking {
-        println("🎾🎾 Hola Tenistas! 🎾🎾")
+        println("🎾🎾 ¡Hola Tenistas! 🎾🎾")
 
         // Iniciamos el servicio de Tenistas
         /*val tenistasService = TenistasServiceImpl(
@@ -75,7 +75,7 @@ class App : KoinComponent {
         // Iniciamos el refresco automático de tenistas (podróas hacerlo con una corrutina, pero ya esta implementada dentro, es para que veas otra forma
         // Si no sería como las notificaciones
         // Si no quieres refresh automático, usa loadData para cargar los datos por primera vez o getAll para obtenerlos
-        tenistasService.refresh()
+        tenistasService.enableAutoRefresh()
 
         delay(2000)
 
@@ -196,6 +196,8 @@ class App : KoinComponent {
 
         // Esperamos 3 segundos
         delay(5000)
+        // Desactivamos el refresco automático
+        tenistasService.disableAutoRefresh()
         println("🔇 Desactivamos la escucha de notificaciones de tenistas 🔇")
         notificationJob.cancel() // Cancelamos la escucha de notificaciones, porque ya no nos interesa
 
@@ -293,7 +295,7 @@ class App : KoinComponent {
         println("País con más puntuación total: ${paisMasPuntuacion?.key} -> ${paisMasPuntuacion?.value}")
 
 
-        println("👋👋 Adios Tenistas 👋👋")
+        println("👋👋 Adiós Tenistas 👋👋")
 
     }
 }

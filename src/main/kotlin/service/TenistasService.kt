@@ -16,6 +16,7 @@ interface TenistasService {
     fun delete(id: Long): Flow<Result<Long, TenistaError>>
     fun import(file: File): Flow<Result<Int, TenistaError>>
     fun export(file: File, fromRemote: Boolean): Flow<Result<Int, TenistaError>>
-    fun refresh()
+    fun enableAutoRefresh()
     suspend fun loadData()
+    fun disableAutoRefresh()
 }

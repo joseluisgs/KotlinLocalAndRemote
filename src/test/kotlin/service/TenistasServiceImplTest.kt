@@ -656,7 +656,7 @@ class TenistasServiceImplTest {
         every { cache.clear() } returns Unit
 
         // Llamar al método que deseas probar
-        val job = launch { service.refresh() }
+        val job = launch { service.enableAutoRefresh() }
 
         delay(1000) // Permitir que la corutina se ejecute por un tiempo específico y con ello se realicen las llamadas
 

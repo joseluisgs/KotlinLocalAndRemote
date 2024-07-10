@@ -33,25 +33,42 @@ class TenistasServiceImpl(
     autoRefresh: Long = REFRESH_TIME,
 ) : TenistasService {
 
+    // Propiedad para las notificaciones
     val notifications: SharedFlow<Notification<TenistaDto>>
         get() = notificationsService.notifications
 
+    // Para el trabajo en segundo plano
+    private var job: Job? = null
+    private val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + (job ?: Job())
 
-    override fun refresh() {
-        // Lanzamos una corutina para que se ejecute en segundo plano, y así no llamarlo en el hilo principal
-        val job = Job()
-        val coroutineContext: CoroutineContext = Dispatchers.IO + job
-        logger.debug { "Inicializando TenistasServiceImpl" }
+
+    override fun enableAutoRefresh() {
+        logger.debug { "Refrescando el repositorio local con los datos remotos " }
+        if (job?.isActive == true) {
+            logger.debug { "El trabajo en segundo plano ya está activo" }
+            return
+        }
+        job = Job()
+        logger.debug { "Iniciando trabajo en segundo plano para refrescar los datos" }
         CoroutineScope(coroutineContext).launch {
             do {
-                logger.debug { "Refrescando el repositorio local con los datos remotos " }
                 loadData()
                 delay(REFRESH_TIME)
             } while (true)
         }
     }
 
+    override fun disableAutoRefresh() {
+        logger.debug { "Desactivando el trabajo en segundo plano" }
+        if (job?.isActive == true) {
+            job?.cancel()
+            job = null
+        }
+    }
+
     override suspend fun loadData() {
+        logger.debug { "Cargando datos en repositorio local con datos remotos" }
         localRepository.removeAll().first() // Borramos los datos locales
             .andThen { remoteRepository.getAll().first() } // Obtenemos los datos remotos
             .andThen { localRepository.saveAll(it).first() }.also {
