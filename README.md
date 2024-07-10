@@ -75,6 +75,15 @@ y nos permiten realizar operaciones asíncronas de forma sencilla y eficiente. L
 pueden emitir de forma asíncrona. De esta manera, se pueden
 realizar operaciones reactivas de forma sencilla y eficiente.
 
+En Kotlin podemos hacer uso de async/await, launch, runBlocking, etc. para trabajar con Coroutines. Async/Await nos
+permite realizar operaciones asíncronas de forma sencilla y eficiente. Launch nos permite lanzar una tarea en segundo
+plano y no esperar a que termine. Async/Await es ideal si necesitamos un resultado, mientras que Launch es ideal si no
+necesitamos un resultado (lanzar y olvidar).
+
+En Kotlin podemos hacer uso de Flows para trabajar con secuencias de valores que se pueden emitir de forma asíncrona y
+reactiva.
+De esta manera podemos procesar los valores de forma sencilla con los operadores de colecciones de Kotlin.
+
 ## Railway Oriented Programming
 
 El [Railway Oriented Programming](https://fsharpforfunandprofit.com/rop/) (ROP) es un estilo de programación que se basa
