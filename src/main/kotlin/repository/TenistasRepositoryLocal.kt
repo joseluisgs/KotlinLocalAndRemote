@@ -3,7 +3,7 @@ package dev.joseluisgs.repository
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.mapBoth
+import com.github.michaelbull.result.andThen
 import database.SqlDeLightManager
 import dev.joseluisgs.error.TenistaError
 import dev.joseluisgs.mapper.toTenista
@@ -59,35 +59,28 @@ class TenistasRepositoryLocal(
     override fun update(id: Long, t: Tenista): Flow<Result<Tenista, TenistaError>> = flow {
         logger.debug { "Actualizando tenista por id: $id en la bd" }
         val timeStamp = LocalDateTime.now()
-        emit(getById(id).first().mapBoth(
-            success = { tenista ->
-                sqlClient.queries.update(
-                    id = id,
-                    nombre = t.nombre,
-                    pais = t.pais,
-                    altura = t.altura.toLong(),
-                    peso = t.peso.toLong(),
-                    puntos = t.puntos.toLong(),
-                    mano = t.mano.name,
-                    fecha_nacimiento = t.fechaNacimiento.toString(),
-                    updated_at = timeStamp.toString()
-                )
-                Ok(t.copy(createdAt = tenista.createdAt, updatedAt = timeStamp))
-            },
-            failure = { error -> Err(error) }
-        ))
-
+        emit(getById(id).first().andThen { tenista ->
+            sqlClient.queries.update(
+                id = id,
+                nombre = t.nombre,
+                pais = t.pais,
+                altura = t.altura.toLong(),
+                peso = t.peso.toLong(),
+                puntos = t.puntos.toLong(),
+                mano = t.mano.name,
+                fecha_nacimiento = t.fechaNacimiento.toString(),
+                updated_at = timeStamp.toString()
+            )
+            Ok(t.copy(createdAt = tenista.createdAt, updatedAt = timeStamp))
+        })
     }.flowOn(Dispatchers.IO)
 
     override fun delete(id: Long): Flow<Result<Long, TenistaError>> = flow {
         logger.debug { "Borrando físico tenista por id: $id en la bd" }
-        emit(getById(id).first().mapBoth(
-            success = {
-                sqlClient.queries.delete(id)
-                Ok(id)
-            },
-            failure = { error -> Err(error) }
-        ))
+        emit(getById(id).first().andThen {
+            sqlClient.queries.delete(id)
+            Ok(id)
+        })
     }.flowOn(Dispatchers.IO)
 
     fun removeAll(): Flow<Result<Unit, TenistaError>> = flow {
