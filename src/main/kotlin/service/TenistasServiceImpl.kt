@@ -30,7 +30,7 @@ class TenistasServiceImpl(
     private val csvStorage: TenistasStorageCsv,
     private val jsonStorage: TenistasStorageJson,
     private val notificationsService: TenistasNotifications,
-    autoRefresh: Long = REFRESH_TIME,
+    private val autoRefresh: Long = REFRESH_TIME,
 ) : TenistasService {
 
     // Propiedad para las notificaciones
@@ -54,7 +54,7 @@ class TenistasServiceImpl(
         CoroutineScope(coroutineContext).launch {
             do {
                 loadData()
-                delay(REFRESH_TIME)
+                delay(autoRefresh)
             } while (true)
         }
     }
@@ -160,7 +160,8 @@ class TenistasServiceImpl(
         tenista.validate()
             .andThen { getById(id).first() } // No es porque va a fallar en remoto si no existe, es un ejemplo para concatenar cosas
             .andThen { remoteRepository.update(id, tenista).first() }
-            .andThen { localRepository.update(id, tenista).first() }.mapBoth(
+            .andThen { localRepository.update(id, tenista).first() }
+            .mapBoth(
                 success = {
                     // Enviamos la notificación de actualización
                     cache.put(it.id, it)

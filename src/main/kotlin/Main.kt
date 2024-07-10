@@ -152,7 +152,7 @@ class App : KoinComponent {
         )
 
         // Obtenemos todos los tenistas
-        tenistas = tenistasService.getAll(false).first().mapBoth(
+        tenistasService.getAll(false).first().mapBoth(
             success = {
                 println("Tenistas obtenidos: ${it.size}")
                 println(it)
