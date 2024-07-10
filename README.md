@@ -3,19 +3,18 @@
 ![Kotlin](./images/kotlin.webp)
 
 - [Kotlin Local and Remote](#kotlin-local-and-remote)
-  - [Acerca de](#acerca-de)
-  - [Programación asíncrona y reactiva](#programación-asíncrona-y-reactiva)
-  - [Railway Oriented Programming](#railway-oriented-programming)
-  - [Almacenamiento y Serialización](#almacenamiento-y-serialización)
-  - [Cache en Memoria](#cache-en-memoria)
-  - [Repositorio Local](#repositorio-local)
-  - [Repositorio Remoto](#repositorio-remoto)
-  - [Validador](#validador)
-  - [Notificaciones](#notificaciones)
-  - [Servicio](#servicio)
-  - [Tests](#tests)
-  - [Inyección de Dependencias](#inyección-de-dependencias)
-
+    - [Acerca de](#acerca-de)
+    - [Programación asíncrona y reactiva](#programación-asíncrona-y-reactiva)
+    - [Railway Oriented Programming](#railway-oriented-programming)
+    - [Almacenamiento y Serialización](#almacenamiento-y-serialización)
+    - [Cache en Memoria](#cache-en-memoria)
+    - [Repositorio Local](#repositorio-local)
+    - [Repositorio Remoto](#repositorio-remoto)
+    - [Validador](#validador)
+    - [Notificaciones](#notificaciones)
+    - [Servicio](#servicio)
+    - [Tests](#tests)
+    - [Inyección de Dependencias](#inyección-de-dependencias)
 
 ## Acerca de
 
@@ -203,6 +202,25 @@ La diferencia principal entre SharedFlow y StateFlow es que StateFlow debe tener
 queremos
 que se mantenga el último valor emitido podemos usar un SharedFlow con replay de 1 y que se borre el buffer los valores
 antiguos.
+
+Por consiguiente hemos usado: un `MutableSharedFlow` para manejar la cola de notificaciones y un` SharedFlo`w para
+leerlas.
+
+El uso de un MutableSharedFlow permite que la cola de notificaciones sea modificable en tiempo real en otros hilos
+El uso de un SharedFlow permite que los hilos que leen las notificaciones sean suscritos y reciban las notificaciones en
+tiempo real
+
+Para configurar el MutableSharedFlow hemos usado los parámetros de `replay` y `onBufferOverflow`.
+
+Con `replay` indicamos el número de elementos que se emitirán a los nuevos suscriptores. En este caso, hemos usado 1
+para
+que se emita el último elemento emitido.
+
+Con `onBufferOverflow` indicamos qué hacer cuando el buffer de elementos está lleno. En este caso, hemos usado
+DROP_OLDEST
+
+De esta manera nos aseguramos que todos los clientes solo reciban la última notificación y si noo puede procesarlas
+siempre se eliminen y solo haya una (la última)
 
 Enlace a
 los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/a742db9eeec1e5dea2d2c8871efde528510f3af7).

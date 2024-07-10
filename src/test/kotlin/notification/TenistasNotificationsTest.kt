@@ -59,7 +59,75 @@ class TenistasNotificationsTest {
                     emittedNotification.createdAt,
                     "La fecha de creación debe ser la misma"
                 )
+            },
+            {
+                assertEquals(
+                    notification.message,
+                    emittedNotification.message,
+                    "El mensaje de la notificación debe ser el mismo"
+                )
             }
         )
     }
+
+    // Otros test
+    @Test
+    @DisplayName("Notificación 1 es ignorada si se recibe Notificación 2 que es la ultima")
+    fun `notificacion 1 es ignorada si se recibe notificacion 2 que es la ultima`() = runTest {
+        // Arrange
+        val testTenista1 = Tenista(
+            id = 1,
+            nombre = "Tenista1",
+            pais = "España",
+            altura = 185,
+            peso = 85,
+            puntos = 10000,
+            mano = Tenista.Mano.ZURDO,
+            fechaNacimiento = LocalDate.of(1986, 6, 3),
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now(),
+            isDeleted = false
+        ).toTenistaDto()
+
+        val notification1 =
+            Notification(Notification.Type.CREATE, testTenista1, "test1", LocalDateTime.now())
+        val notification2 =
+            Notification(Notification.Type.CREATE, testTenista1, "test2", LocalDateTime.now())
+
+        val tenistasNotifications = TenistasNotifications()
+
+        // Act
+        tenistasNotifications.send(notification1)
+        tenistasNotifications.send(notification2)
+
+        // Assert
+        val emittedNotification = tenistasNotifications.notifications.distinctUntilChanged().first()
+
+        assertAll(
+            { assertEquals(notification2, emittedNotification, "La notificación debe ser la misma") },
+            { assertEquals(notification2.type, emittedNotification.type, "El tipo de notificación debe ser el mismo") },
+            {
+                assertEquals(
+                    notification2.item,
+                    emittedNotification.item,
+                    "El ítem de la notificación debe ser el mismo"
+                )
+            },
+            {
+                assertEquals(
+                    notification2.message,
+                    emittedNotification.message,
+                    "La fecha de creación debe ser la misma"
+                )
+            },
+            {
+                assertEquals(
+                    notification2.createdAt,
+                    emittedNotification.createdAt,
+                    "El mensaje de la notificación debe ser el mismo"
+                )
+            }
+        )
+    }
+
 }
