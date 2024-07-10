@@ -60,10 +60,12 @@ class TenistasServiceImpl(
     }
 
     override fun disableAutoRefresh() {
-        logger.debug { "Desactivando el trabajo en segundo plano" }
         if (job?.isActive == true) {
+            logger.debug { "Desactivando el trabajo en segundo plano" }
             job?.cancel()
             job = null
+        } else {
+            logger.debug { "El trabajo en segundo plano no está activo" }
         }
     }
 
