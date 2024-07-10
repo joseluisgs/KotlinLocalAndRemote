@@ -90,8 +90,8 @@ De esta manera podemos procesar los valores de forma sencilla con los operadores
   al
   final.
 
-En muchas partes de erste código nos decantaremos por Flow para darle un enfoque más reactivo aunque esto suponga
-sobrecarga innecesaria. Recurda que es educativo y es para que tú practiques cosas nuevas.
+En muchas partes de este código nos decantaremos por Flow para darle un enfoque más reactivo aunque esto suponga
+sobrecarga innecesaria. Recuerda que es educativo y es para que tú practiques cosas nuevas.
 
 ## Railway Oriented Programming
 
