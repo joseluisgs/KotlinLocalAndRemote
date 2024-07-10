@@ -3,7 +3,7 @@ package dev.joseluisgs
 import com.github.michaelbull.result.mapBoth
 import dev.joseluisgs.di.appModule
 import dev.joseluisgs.model.Tenista
-import dev.joseluisgs.notifications.Notification
+import dev.joseluisgs.notification.Notification
 import dev.joseluisgs.service.TenistasServiceImpl
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged

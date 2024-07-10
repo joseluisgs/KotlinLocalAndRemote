@@ -1,8 +1,9 @@
 package notification
 
+import dev.joseluisgs.mapper.toTenistaDto
 import dev.joseluisgs.model.Tenista
-import dev.joseluisgs.notifications.Notification
-import dev.joseluisgs.notifications.TenistasNotifications
+import dev.joseluisgs.notification.Notification
+import dev.joseluisgs.notification.TenistasNotifications
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -31,7 +32,7 @@ class TenistasNotificationsTest {
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now(),
             isDeleted = false
-        )
+        ).toTenistaDto()
         val notification =
             Notification(Notification.Type.CREATE, testTenista, "Creación de tenista", LocalDateTime.now())
         val tenistasNotifications = TenistasNotifications()

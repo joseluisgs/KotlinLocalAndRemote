@@ -1,4 +1,4 @@
-package dev.joseluisgs.notifications
+package dev.joseluisgs.notification
 
 import java.time.LocalDateTime
 

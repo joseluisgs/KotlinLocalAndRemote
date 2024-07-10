@@ -5,7 +5,7 @@ import database.createDatabase
 import dev.joseluisgs.cache.TENISTAS_CACHE_SIZE
 import dev.joseluisgs.cache.TenistasCache
 import dev.joseluisgs.cache.TenistasCacheImpl
-import dev.joseluisgs.notifications.TenistasNotifications
+import dev.joseluisgs.notification.TenistasNotifications
 import dev.joseluisgs.repository.TenistasRepositoryLocal
 import dev.joseluisgs.repository.TenistasRepositoryRemote
 import dev.joseluisgs.rest.API_TENISTAS_URL

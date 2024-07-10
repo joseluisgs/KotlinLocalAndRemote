@@ -2,10 +2,12 @@ package dev.joseluisgs.service
 
 import com.github.michaelbull.result.*
 import dev.joseluisgs.cache.TenistasCache
+import dev.joseluisgs.dto.TenistaDto
 import dev.joseluisgs.error.TenistaError
+import dev.joseluisgs.mapper.toTenistaDto
 import dev.joseluisgs.model.Tenista
-import dev.joseluisgs.notifications.Notification
-import dev.joseluisgs.notifications.TenistasNotifications
+import dev.joseluisgs.notification.Notification
+import dev.joseluisgs.notification.TenistasNotifications
 import dev.joseluisgs.repository.TenistasRepositoryLocal
 import dev.joseluisgs.repository.TenistasRepositoryRemote
 import dev.joseluisgs.storage.TenistasStorageCsv
@@ -31,7 +33,7 @@ class TenistasServiceImpl(
     autoRefresh: Long = REFRESH_TIME,
 ) : TenistasService {
 
-    val notifications: SharedFlow<Notification<Tenista>>
+    val notifications: SharedFlow<Notification<TenistaDto>>
         get() = notificationsService.notifications
 
 
@@ -123,7 +125,7 @@ class TenistasServiceImpl(
                     notificationsService.send(
                         Notification(
                             type = Notification.Type.CREATE,
-                            item = it,
+                            item = it.toTenistaDto(),
                             message = "Nuevo tenista creado con id: ${it.id}"
                         )
                     )
@@ -146,7 +148,7 @@ class TenistasServiceImpl(
                     notificationsService.send(
                         Notification(
                             type = Notification.Type.UPDATE,
-                            item = it,
+                            item = it.toTenistaDto(),
                             message = "Tenista actualizado con id: ${it.id}"
                         )
                     )
