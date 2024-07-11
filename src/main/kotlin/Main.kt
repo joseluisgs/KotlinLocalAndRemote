@@ -126,19 +126,6 @@ class App : KoinComponent {
             failure = { println(it.message) }
         )
 
-        // Obtenemos todos los tenistas
-        tenistas = tenistasService.getAll(false).first().mapBoth(
-            success = {
-                println("Tenistas obtenidos: ${it.size}")
-                println(it)
-                it
-            },
-            failure = {
-                println(it.message)
-                emptyList()
-            }
-        )
-
 
         // Actualizamos un tenista
         val updatedTenista = tenistas.first().copy(
@@ -151,18 +138,6 @@ class App : KoinComponent {
             failure = { println(it.message) }
         )
 
-        // Obtenemos todos los tenistas
-        tenistasService.getAll(false).first().mapBoth(
-            success = {
-                println("Tenistas obtenidos: ${it.size}")
-                println(it)
-                it
-            },
-            failure = {
-                println(it.message)
-                emptyList()
-            }
-        )
 
         // Actualizamos un tenista que no existe
         tenistasService.update(-1, updatedTenista).first().mapBoth(
@@ -171,7 +146,13 @@ class App : KoinComponent {
         )
 
         // Borramos un tenista
-        tenistasService.delete(updatedTenista.id).first().mapBoth(
+        tenistasService.delete(tenistas[2].id).first().mapBoth(
+            success = { println("Tenista borrado") },
+            failure = { println(it.message) }
+        )
+
+        // Borramos un tenista que no existe
+        tenistasService.delete(-1).first().mapBoth(
             success = { println("Tenista borrado") },
             failure = { println(it.message) }
         )
@@ -187,12 +168,6 @@ class App : KoinComponent {
                 println(it.message)
                 emptyList()
             }
-        )
-
-        // Borramos un tenista que no existe
-        tenistasService.delete(-1).first().mapBoth(
-            success = { println("Tenista borrado") },
-            failure = { println(it.message) }
         )
 
         // Esperamos 3 segundos

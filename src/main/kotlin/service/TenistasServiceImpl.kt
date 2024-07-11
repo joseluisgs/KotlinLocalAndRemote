@@ -238,8 +238,7 @@ class TenistasServiceImpl(
             success = {
                 tenistas.forEach { tenista ->
                     remoteRepository.save(tenista).first()
-                        .andThen { localRepository.save(it).first() }
-                        .andThen { Ok(contador++) }
+                        .andThen { localRepository.save(it).first() }.map { contador++ }
                 }
             },
             failure = { return Err(it) }
