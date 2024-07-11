@@ -206,18 +206,10 @@ class App : KoinComponent {
             failure = { println(it.message) }
         )
 
-        // Consultamos todos los tenistas para hacerles las consultas
-        tenistas = tenistasService.getAll(true).first().mapBoth(
-            success = {
-                println("Tenistas obtenidos: ${it.size}")
-                println(it)
-                it
-            },
-            failure = {
-                println(it.message)
-                emptyList()
-            }
-        )
+        // Consultamos todos los tenistas para hacerles las consultas, ya sé cuales tenemos remotos!!!
+        tenistas = tenistasService.getAll(true).first().value
+
+        // Comenzamos las consultas con colecciones y la api de kotlin
 
         // tenistas ordenados con ranking, es decir, por puntos de mayor a menor
         println("Tenistas ordenados por ranking")
@@ -245,13 +237,19 @@ class App : KoinComponent {
         val tenistasEspanoles = tenistas.filter { it.pais == "España" }
         println("Tenistas españoles: ${tenistasEspanoles.size}")
 
+        // Tenistas con más de 5000 puntos
+        val tenistasMasDe5000 = tenistas.filter { it.puntos > 5000 }
+        println("Tenistas con más de 5000 puntos: ${tenistasMasDe5000.size}")
+
         // Tenistas agrupados por pais
+        println("Tenistas agrupados por pais")
         val tenistasPorPais = tenistas.groupBy { it.pais }
         tenistasPorPais.forEach { (pais, tenistas) ->
             println("Tenistas de $pais: ${tenistas.size}")
         }
 
         // Número de tenistas agrupados por pais y ordenados por puntos descendente
+        println("Tenistas agrupados por pais y ordenados por puntos descendente")
         val tenistasPorPaisOrdenados = tenistas.groupBy { it.pais }
             .mapValues { it.value.sortedByDescending { tenista -> tenista.puntos } }
         tenistasPorPaisOrdenados.forEach { (pais, tenistas) ->
@@ -260,6 +258,7 @@ class App : KoinComponent {
         }
 
         // Puntuación total de los tenistas agrupados por pais
+        println("Puntuación total de los tenistas agrupados por pais")
         val puntuacionTotalPorPais = tenistas.groupBy { it.pais }
             .mapValues { it.value.sumOf { tenista -> tenista.puntos } }
         puntuacionTotalPorPais.forEach { (pais, puntos) ->

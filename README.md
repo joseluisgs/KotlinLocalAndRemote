@@ -3,18 +3,19 @@
 ![Kotlin](./images/kotlin.webp)
 
 - [Kotlin Local and Remote](#kotlin-local-and-remote)
-    - [Acerca de](#acerca-de)
-    - [Programación asíncrona y reactiva](#programación-asíncrona-y-reactiva)
-    - [Railway Oriented Programming](#railway-oriented-programming)
-    - [Almacenamiento y Serialización](#almacenamiento-y-serialización)
-    - [Cache en Memoria](#cache-en-memoria)
-    - [Repositorio Local](#repositorio-local)
-    - [Repositorio Remoto](#repositorio-remoto)
-    - [Validador](#validador)
-    - [Notificaciones](#notificaciones)
-    - [Servicio](#servicio)
-    - [Tests](#tests)
-    - [Inyección de Dependencias](#inyección-de-dependencias)
+  - [Acerca de](#acerca-de)
+  - [Programación asíncrona y reactiva](#programación-asíncrona-y-reactiva)
+  - [Railway Oriented Programming](#railway-oriented-programming)
+  - [Almacenamiento y Serialización](#almacenamiento-y-serialización)
+  - [Cache en Memoria](#cache-en-memoria)
+  - [Repositorio Local](#repositorio-local)
+  - [Repositorio Remoto](#repositorio-remoto)
+  - [Validador](#validador)
+  - [Notificaciones](#notificaciones)
+  - [Servicio](#servicio)
+  - [Tests](#tests)
+  - [Inyección de Dependencias](#inyección-de-dependencias)
+  - [Lectura de parámetros de configuración](#lectura-de-parámetros-de-configuración)
 
 ## Acerca de
 
@@ -281,3 +282,9 @@ Finalmente nos permite poder testear nuestros módulos.
 
 Enlace a
 los [commit de la sección](https://github.com/joseluisgs/KotlinLocalAndRemote/tree/3fe6a52f4645714b717ad2739c69a2d7a21cb90e).
+
+## Lectura de parámetros de configuración
+Usaremos el fichero de propiedades `config.properties` para leer los parámetros de configuración. Para ello, hemos creado
+un fichero en el directorio `resources` con los parámetros de configuración.
+Haremos uso de Koin con un módulo para inyectar las propiedades de configuración en el servicio gracias a 
+`fileProperties("/config.properties")`
