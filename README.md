@@ -95,6 +95,8 @@ De esta manera podemos procesar los valores de forma sencilla con los operadores
 En muchas partes de este código nos decantaremos por Flow para darle un enfoque más reactivo aunque esto suponga
 sobrecarga innecesaria. Recuerda que es educativo y es para que tú practiques cosas nuevas.
 
+De todas formas te dejo los tres "sabores" para que puedas ver cómo se pueden usar. Los iré intercambiando para que analices pros y contras de cada uno respecto a las versiones de Java y C#.
+
 ## Railway Oriented Programming
 
 El [Railway Oriented Programming](https://fsharpforfunandprofit.com/rop/) (ROP) es un estilo de programación que se basa
