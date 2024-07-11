@@ -79,7 +79,7 @@ realizar operaciones reactivas de forma sencilla y eficiente.
 En Kotlin podemos hacer uso de async/await, launch, runBlocking, etc. para trabajar con Coroutines. Async/Await nos
 permite realizar operaciones asíncronas de forma sencilla y eficiente. Launch nos permite lanzar una tarea en segundo
 plano y no esperar a que termine. Async/Await es ideal si necesitamos un resultado, mientras que Launch es ideal si no
-necesitamos un resultado (lanzar y olvidar).
+necesitamos un resultado (lanzar y olvidar). Todo gracias a las funciones de suspensión de Kotlin.
 
 En Kotlin podemos hacer uso de Flows para trabajar con secuencias de valores que se pueden emitir de forma asíncrona y
 reactiva.
@@ -90,6 +90,7 @@ De esta manera podemos procesar los valores de forma sencilla con los operadores
 - Usa async/await cuando tengas tareas asíncronas discretas que necesiten ejecutarse de manera concurrente y combinadas
   al
   final.
+- Usa funciones de suspensión con withContext cuando necesites cambiar el contexto de ejecución de una tarea asíncrona.
 
 En muchas partes de este código nos decantaremos por Flow para darle un enfoque más reactivo aunque esto suponga
 sobrecarga innecesaria. Recuerda que es educativo y es para que tú practiques cosas nuevas.
